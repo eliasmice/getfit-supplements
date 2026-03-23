@@ -166,7 +166,7 @@
     .pp-thumb.active{border-color:var(--neon);}
     .pp-thumb img{width:100%;height:100%;object-fit:contain;background:#f5f5f5;}
     /* Lightbox */
-    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;}
     .lightbox.open{display:flex;}
     .lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;}
     .lightbox-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
@@ -288,8 +288,8 @@
     </a>
     <div class="header-right">
       <div class="search-bar">
-        <span style="color:var(--muted);font-size:15px">🔍</span>
-        <input type="text" id="searchInput" placeholder="Buscar productos o marcas..." oninput="handleSearch()">
+        <span style="color:var(--muted);font-size:15px;cursor:pointer" onclick="document.getElementById('searchInput').focus()">🔍</span>
+        <input type="text" id="searchInput" placeholder="Buscar productos o marcas..." oninput="handleSearch()" onkeydown="if(event.key==='Escape'){this.value='';handleSearch();}">
       </div>
       <button class="cart-btn" onclick="openCart()">
         🛒 Carrito
@@ -385,7 +385,7 @@
 <div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <button class="lightbox-arr prev" onclick="event.stopPropagation();lbSlide(-1)">‹</button>
-  <img id="lbImg" src="" alt="" onclick="event.stopPropagation()" style="cursor:default">
+  <img id="lbImg" src="" alt="" style="cursor:default;max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;">
   <button class="lightbox-arr next" onclick="event.stopPropagation();lbSlide(1)">›</button>
 </div>
 
@@ -722,7 +722,14 @@ function removeFilter(type, val, sub) {
   aplicarFiltros();
 }
 
-function handleSearch(){ searchTerm=document.getElementById('searchInput').value.toLowerCase().trim(); aplicarFiltros(); }
+function handleSearch(){
+  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+  // if on product page, go back to catalog first
+  if (document.getElementById('viewProduct').style.display !== 'none') {
+    showCatalog();
+  }
+  aplicarFiltros();
+}
 function sortProducts(v){ sortOrder=v; aplicarFiltros(); }
 
 // ── RENDER GRID ──────────────────────────
@@ -829,10 +836,10 @@ function renderProductPage(p) {
     <div class="pp-thumb ${i===0?'active':''}" id="thumb-${i}" onclick="ppSelectImg(${i},'${esc(u)}')">
       <img src="${esc(u)}" alt="${esc(p.nombre)}" loading="lazy">
     </div>`).join('');
-  // Store imgs in window for lightbox (avoids escaping issues in onclick)
-  window._ppImgs = p.imgs;
+  // Store imgs globally for lightbox
+  window._ppImgs = p.imgs.slice();
   const mainImg = p.imgs.length
-    ? `<img id="ppMainImg" src="${esc(p.imgs[0])}" alt="${esc(p.nombre)}" onclick="openLightbox(window._ppImgs, 0)" style="cursor:zoom-in">`
+    ? `<img id="ppMainImg" src="${esc(p.imgs[0])}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)">`
     : `<div class="fallback" style="font-size:80px;display:flex;align-items:center;justify-content:center;height:100%">💪</div>`;
 
   // Tags
@@ -918,13 +925,28 @@ function shareProduct(pid) {
 
 // ── LIGHTBOX ─────────────────────────────
 function openLightbox(imgs, idx) {
-  lbImgs=imgs; lbCur=idx;
-  document.getElementById('lbImg').src=imgs[idx];
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow='hidden';
+  if (!imgs || !imgs.length) return;
+  lbImgs = Array.isArray(imgs) ? imgs : [imgs];
+  lbCur  = idx || 0;
+  const lb  = document.getElementById('lightbox');
+  const img = document.getElementById('lbImg');
+  img.src = lbImgs[lbCur];
+  // show/hide arrows
+  document.querySelectorAll('.lightbox-arr').forEach(a => {
+    a.style.display = lbImgs.length > 1 ? 'flex' : 'none';
+  });
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
-function lbSlide(dir){lbCur=(lbCur+dir+lbImgs.length)%lbImgs.length;document.getElementById('lbImg').src=lbImgs[lbCur];}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function lbSlide(dir) {
+  if (!lbImgs.length) return;
+  lbCur = (lbCur + dir + lbImgs.length) % lbImgs.length;
+  document.getElementById('lbImg').src = lbImgs[lbCur];
+}
 
 // ── CART ─────────────────────────────────
 function syncCardBadge(pid) {
