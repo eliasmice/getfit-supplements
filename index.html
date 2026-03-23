@@ -83,6 +83,8 @@
     .active-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
     .af-chip{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--neon);display:flex;align-items:center;gap:5px;}
     .af-chip button{background:none;border:none;color:var(--neon);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+    .clear-all-btn{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--promo);cursor:pointer;transition:all .15s;font-family:'Barlow',sans-serif;white-space:nowrap;}
+    .clear-all-btn:hover{background:rgba(255,107,53,.2);border-color:var(--promo);}
 
     /* SKELETON */
     .skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
@@ -152,13 +154,13 @@
 
     /* Product page gallery */
     .pp-gallery{position:sticky;top:86px;}
-    .pp-main-img{width:100%;aspect-ratio:1;background:#f0f0f0;border-radius:16px;overflow:hidden;position:relative;margin-bottom:12px;}
-    .pp-main-img img{width:100%;height:100%;object-fit:cover;cursor:zoom-in;}
+    .pp-main-img{width:100%;aspect-ratio:1;background:#f5f5f5;border-radius:16px;overflow:hidden;position:relative;margin-bottom:12px;display:flex;align-items:center;justify-content:center;}
+    .pp-main-img img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;padding:8px;}
     .pp-main-img .fallback{font-size:80px;display:flex;align-items:center;justify-content:center;height:100%;}
     .pp-thumbs{display:flex;gap:8px;flex-wrap:wrap;}
     .pp-thumb{width:72px;height:72px;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .15s;background:#f0f0f0;flex-shrink:0;}
     .pp-thumb.active{border-color:var(--neon);}
-    .pp-thumb img{width:100%;height:100%;object-fit:cover;}
+    .pp-thumb img{width:100%;height:100%;object-fit:contain;background:#f5f5f5;}
     /* Lightbox */
     .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
     .lightbox.open{display:flex;}
@@ -376,10 +378,10 @@
 </div>
 
 <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <button class="lightbox-arr prev" onclick="event.stopPropagation();lbSlide(-1)">‹</button>
-  <img id="lbImg" src="" alt="">
+  <img id="lbImg" src="" alt="" onclick="event.stopPropagation()" style="cursor:default">
   <button class="lightbox-arr next" onclick="event.stopPropagation();lbSlide(1)">›</button>
 </div>
 
@@ -456,7 +458,20 @@ window.addEventListener('popstate', handleURL);
 
 function goHome() {
   history.pushState(null, '', window.location.pathname);
+  limpiarTodo();
   showCatalog();
+}
+
+function limpiarTodo() {
+  activeCats.clear();
+  activeBrands.clear();
+  filterPromo = false;
+  filterNuevo = false;
+  searchTerm  = '';
+  document.getElementById('searchInput').value = '';
+  // deselect all pills
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  aplicarFiltros();
 }
 
 function showCatalog() {
@@ -613,6 +628,8 @@ function renderActiveFilters() {
   activeBrands.forEach(b  => chips+=`<div class="af-chip">${esc(b)}<button onclick="removeFilter('brand','${esc(b)}')">×</button></div>`);
   if (filterPromo) chips+=`<div class="af-chip">🔥 Ofertas<button onclick="removeFilter('promo')">×</button></div>`;
   if (filterNuevo) chips+=`<div class="af-chip">✨ Nuevos<button onclick="removeFilter('nuevo')">×</button></div>`;
+  const hasFilters = activeCats.size||activeBrands.size||filterPromo||filterNuevo||searchTerm;
+  if (hasFilters) chips+=`<button class="clear-all-btn" onclick="limpiarTodo()">✕ Quitar todos los filtros</button>`;
   af.innerHTML = chips;
 }
 
