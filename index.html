@@ -71,7 +71,10 @@
     .pill.promo-pill.active{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.4);color:var(--promo);}
 
     /* Subcategory indent */
-    .sub-pill{margin-left:8px;font-size:11px;}
+    .sub-pill{font-size:11px;padding:4px 10px;}
+    .sub-pill::before{content:"↳ ";color:var(--neon-dim);}
+    .cat-parent{font-weight:600;width:100%;}
+    .subcat-group{display:flex;flex-wrap:wrap;gap:5px;width:100%;padding-left:8px;border-left:2px solid var(--border);margin-top:2px;}
 
     /* MAIN */
     .content-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
@@ -392,9 +395,6 @@
 const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
 const WHATSAPP  = '50689754195';
 
-// Subcategorías de proteínas (padre → hijos)
-const PROTEIN_SUBS = ['Proteína Whey','Proteína Isolatada','Base de Carne','Veganas'];
-const PROTEIN_PARENT = 'Proteínas';
 // ═══════════════════════════════════════
 
 let todos       = [];
@@ -418,20 +418,20 @@ async function cargarProductos() {
     if (!res.ok) throw new Error('No se pudo conectar al catálogo');
     const data = await res.json();
     todos = data.map((row, i) => ({
-      id:          i,
-      nombre:      (row.nombre      ||'').trim(),
-      marca:       (row.marca       ||'').trim(),
-      precio:      parseInt(row.precio)       ||0,
-      precio_promo:parseInt(row.precio_promo) ||0,
-      categoria:   (row.categoria   ||'Suplementos').trim(),
-      descripcion: (row.descripcion ||'').trim(),
-      info:        (row.info        ||'').trim(),
-      imagen1:     (row.imagen1     ||'').trim(),
-      imagen2:     (row.imagen2     ||'').trim(),
-      imagen3:     (row.imagen3     ||'').trim(),
-      imagen4:     (row.imagen4     ||'').trim(),
-      disponible:  (row.disponible  ||'si').toLowerCase() !== 'no',
-      nuevo:       (row.nuevo       ||'no').toLowerCase() === 'si',
+      id:           i,
+      nombre:       (row.nombre       ||'').trim(),
+      marca:        (row.marca        ||'').trim(),
+      precio:       parseInt(row.precio)        ||0,
+      precio_promo: parseInt(row.precio_promo)  ||0,
+      categoria:    (row.categoria    ||'Suplementos').trim(),
+      subcategoria: (row.subcategoria ||'').trim(),
+      info:         (row.info         ||'').trim(),
+      imagen1:      (row.imagen1      ||'').trim(),
+      imagen2:      (row.imagen2      ||'').trim(),
+      imagen3:      (row.imagen3      ||'').trim(),
+      imagen4:      (row.imagen4      ||'').trim(),
+      disponible:   (row.disponible   ||'si').toLowerCase() !== 'no',
+      nuevo:        (row.nuevo        ||'no').toLowerCase() === 'si',
     })).filter(p => p.nombre)
       .map(p => ({...p, imgs:[p.imagen1,p.imagen2,p.imagen3,p.imagen4].filter(Boolean)}));
     construirSidebar();
@@ -465,11 +465,11 @@ function goHome() {
 function limpiarTodo() {
   activeCats.clear();
   activeBrands.clear();
+  activeSubcats = {};
   filterPromo = false;
   filterNuevo = false;
   searchTerm  = '';
   document.getElementById('searchInput').value = '';
-  // deselect all pills
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   aplicarFiltros();
 }
@@ -492,12 +492,15 @@ function showProductPage(p, pushState = true) {
 
 // ── SIDEBAR ─────────────────────────────
 function construirSidebar() {
-  // Build category groups
-  const allCats  = [...new Set(todos.map(p=>p.categoria))].sort();
-  // separate protein subs from others
-  const otherCats = allCats.filter(c => !PROTEIN_SUBS.includes(c));
-  const hasSubs   = PROTEIN_SUBS.filter(s => allCats.includes(s));
-  const marcas    = [...new Set(todos.map(p=>p.marca))].sort();
+  const marcas = [...new Set(todos.map(p=>p.marca))].sort();
+
+  // Build category tree: { cat: Set(subcats) }
+  // If a product has subcategoria, cat has children; else standalone
+  const catTree = {};
+  todos.forEach(p => {
+    if (!catTree[p.categoria]) catTree[p.categoria] = new Set();
+    if (p.subcategoria) catTree[p.categoria].add(p.subcategoria);
+  });
 
   let html = '';
 
@@ -513,26 +516,33 @@ function construirSidebar() {
     </div>
   </div>`;
 
-  // Categorías
+  // Categorías dinámicas con subcategorías
   html += `<div class="fgroup open">
     <div class="fgroup-header" onclick="toggleFgroup(this)">
       <span class="fgroup-title">Categorías</span>
       <span class="fgroup-arrow">▼</span>
     </div>
     <div class="fgroup-body">`;
-  // Proteínas con subcategorías
-  if (hasSubs.length) {
-    html += `<span class="pill" onclick="toggleCatGroup(this)">${PROTEIN_PARENT}</span>`;
-    hasSubs.forEach(s => {
-      const n = todos.filter(p=>p.categoria===s).length;
-      html += `<span class="pill sub-pill" data-cat="${esc(s)}" onclick="toggleCat('${esc(s)}',this)">${esc(s)} <small>(${n})</small></span>`;
-    });
-  }
-  // Otras categorías
-  otherCats.forEach(c => {
-    const n = todos.filter(p=>p.categoria===c).length;
-    html += `<span class="pill" data-cat="${esc(c)}" onclick="toggleCat('${esc(c)}',this)">${esc(c)} <small>(${n})</small></span>`;
+
+  Object.entries(catTree).sort(([a],[b])=>a.localeCompare(b)).forEach(([cat, subcats]) => {
+    const nCat = todos.filter(p=>p.categoria===cat).length;
+    const hasSubs = subcats.size > 0;
+
+    if (hasSubs) {
+      // Category with subcategories: show parent pill + indented sub-pills
+      html += `<span class="pill cat-parent" data-cat="${esc(cat)}" onclick="toggleCat('${esc(cat)}',this)">${esc(cat)} <small>(${nCat})</small></span>`;
+      html += `<div class="subcat-group">`;
+      [...subcats].sort().forEach(sub => {
+        const nSub = todos.filter(p=>p.categoria===cat && p.subcategoria===sub).length;
+        html += `<span class="pill sub-pill" data-cat="${esc(cat)}" data-sub="${esc(sub)}" onclick="toggleSubcat('${esc(cat)}','${esc(sub)}',this)">${esc(sub)} <small>(${nSub})</small></span>`;
+      });
+      html += `</div>`;
+    } else {
+      // Standalone category
+      html += `<span class="pill" data-cat="${esc(cat)}" onclick="toggleCat('${esc(cat)}',this)">${esc(cat)} <small>(${nCat})</small></span>`;
+    }
   });
+
   html += `</div></div>`;
 
   // Marcas
@@ -553,23 +563,41 @@ function toggleFgroup(header) {
   header.closest('.fgroup').classList.toggle('open');
 }
 
-function toggleCatGroup(pill) {
-  // toggle all protein subs
-  const subs   = PROTEIN_SUBS.filter(s => todos.some(p=>p.categoria===s));
-  const allOn  = subs.every(s => activeCats.has(s));
-  if (allOn) { subs.forEach(s=>activeCats.delete(s)); pill.classList.remove('active'); }
-  else       { subs.forEach(s=>activeCats.add(s));    pill.classList.add('active'); }
-  // sync sub pills
-  document.querySelectorAll('.sub-pill').forEach(sp => {
-    const c = sp.dataset.cat;
-    sp.classList.toggle('active', activeCats.has(c));
-  });
+// activeSubcats: { 'Proteínas': Set(['Whey','Isolatada']), ... }
+let activeSubcats = {};
+
+function toggleCat(cat, pill) {
+  // clicking parent category: toggle entire category (all subcats or none)
+  if (activeCats.has(cat)) {
+    activeCats.delete(cat);
+    if (activeSubcats[cat]) { activeSubcats[cat].clear(); }
+    pill.classList.remove('active');
+    // deselect sub-pills
+    document.querySelectorAll(`.sub-pill[data-cat="${cat}"]`).forEach(sp => sp.classList.remove('active'));
+  } else {
+    activeCats.add(cat);
+    pill.classList.add('active');
+  }
   aplicarFiltros();
 }
 
-function toggleCat(cat, pill) {
-  if (activeCats.has(cat)) { activeCats.delete(cat); pill.classList.remove('active'); }
-  else                     { activeCats.add(cat);    pill.classList.add('active'); }
+function toggleSubcat(cat, sub, pill) {
+  if (!activeSubcats[cat]) activeSubcats[cat] = new Set();
+  if (activeSubcats[cat].has(sub)) {
+    activeSubcats[cat].delete(sub);
+    pill.classList.remove('active');
+    // if no subs active, also deactivate parent
+    if (activeSubcats[cat].size === 0) {
+      activeCats.delete(cat);
+      document.querySelectorAll(`.cat-parent[data-cat="${cat}"]`).forEach(p => p.classList.remove('active'));
+    }
+  } else {
+    activeSubcats[cat].add(sub);
+    pill.classList.add('active');
+    // auto-activate parent
+    activeCats.add(cat);
+    document.querySelectorAll(`.cat-parent[data-cat="${cat}"]`).forEach(p => p.classList.add('active'));
+  }
   aplicarFiltros();
 }
 
@@ -596,7 +624,15 @@ const pFinal = p => p.precio_promo || p.precio;
 
 function aplicarFiltros() {
   let lista = [...todos];
-  if (activeCats.size)   lista = lista.filter(p => activeCats.has(p.categoria));
+  if (activeCats.size) {
+    lista = lista.filter(p => {
+      if (!activeCats.has(p.categoria)) return false;
+      // if this category has active subcats, filter by them
+      const subs = activeSubcats[p.categoria];
+      if (subs && subs.size > 0) return subs.has(p.subcategoria);
+      return true;
+    });
+  }
   if (activeBrands.size) lista = lista.filter(p => activeBrands.has(p.marca));
   if (filterPromo)       lista = lista.filter(p => p.precio_promo > 0);
   if (filterNuevo)       lista = lista.filter(p => p.nuevo);
@@ -624,7 +660,15 @@ function aplicarFiltros() {
 function renderActiveFilters() {
   const af = document.getElementById('activeFilters');
   let chips = '';
-  activeCats.forEach(c    => chips+=`<div class="af-chip">${esc(c)}<button onclick="removeFilter('cat','${esc(c)}')">×</button></div>`);
+  activeCats.forEach(cat => {
+    const subs = activeSubcats[cat];
+    if (subs && subs.size > 0) {
+      // show sub-chips instead of parent
+      subs.forEach(sub => chips+=`<div class="af-chip">${esc(cat)}: ${esc(sub)}<button onclick="removeFilter('sub','${esc(cat)}','${esc(sub)}')">×</button></div>`);
+    } else {
+      chips+=`<div class="af-chip">${esc(cat)}<button onclick="removeFilter('cat','${esc(cat)}')">×</button></div>`;
+    }
+  });
   activeBrands.forEach(b  => chips+=`<div class="af-chip">${esc(b)}<button onclick="removeFilter('brand','${esc(b)}')">×</button></div>`);
   if (filterPromo) chips+=`<div class="af-chip">🔥 Ofertas<button onclick="removeFilter('promo')">×</button></div>`;
   if (filterNuevo) chips+=`<div class="af-chip">✨ Nuevos<button onclick="removeFilter('nuevo')">×</button></div>`;
@@ -633,8 +677,22 @@ function renderActiveFilters() {
   af.innerHTML = chips;
 }
 
-function removeFilter(type, val) {
-  if (type==='cat')   { activeCats.delete(val);   document.querySelectorAll(`[data-cat="${val}"]`).forEach(el=>el.classList.remove('active')); }
+function removeFilter(type, val, sub) {
+  if (type==='cat')   {
+    activeCats.delete(val);
+    if (activeSubcats[val]) activeSubcats[val].clear();
+    document.querySelectorAll(`[data-cat="${val}"]`).forEach(el=>el.classList.remove('active'));
+  }
+  if (type==='sub')   {
+    if (activeSubcats[val]) {
+      activeSubcats[val].delete(sub);
+      document.querySelectorAll(`.sub-pill[data-cat="${val}"][data-sub="${sub}"]`).forEach(el=>el.classList.remove('active'));
+      if (activeSubcats[val].size===0) {
+        activeCats.delete(val);
+        document.querySelectorAll(`.cat-parent[data-cat="${val}"]`).forEach(el=>el.classList.remove('active'));
+      }
+    }
+  }
   if (type==='brand') { activeBrands.delete(val); document.querySelectorAll(`[data-brand="${val}"]`).forEach(el=>el.classList.remove('active')); }
   if (type==='promo') { filterPromo=false; document.querySelectorAll('.promo-pill').forEach(el=>el.classList.remove('active')); }
   if (type==='nuevo') { filterNuevo=false; document.querySelectorAll('.pill:not(.promo-pill)').forEach(el=>{ if(el.textContent.includes('Nuevo'))el.classList.remove('active'); }); }
@@ -692,7 +750,7 @@ function renderProductos() {
           <div class="card-qty-badge" id="qbadge-${p.id}" style="display:${qty>0?'block':'none'}">${qty} en carrito</div>
         </div>
         <div class="product-info">
-          <div class="product-category">${esc(p.categoria)}</div>
+          <div class="product-category">${esc(p.subcategoria || p.categoria)}</div>
           <div class="product-name">${esc(p.nombre)}</div>
           <div class="product-desc">${esc(p.descripcion)}</div>
         </div>
@@ -789,13 +847,13 @@ function renderProductPage(p) {
       <div class="pp-brand">${esc(p.marca)}</div>
       <div class="pp-name">${esc(p.nombre)}</div>
       <div class="pp-tags">
-        <span class="pp-cat">${esc(p.categoria)}</span>
+        <span class="pp-cat">${esc(p.categoria)}${p.subcategoria ? " · " + esc(p.subcategoria) : ""}</span>
         ${ptag}
       </div>
       <div class="pp-price-block">${priceHTML}</div>
       ${footer}
-      ${p.descripcion?`<div><div class="pp-section-title">Descripción</div><div class="pp-desc">${esc(p.descripcion)}</div></div>`:''}
-      ${p.info?`<div><div class="pp-section-title">Información Nutricional</div><div class="pp-info-box">${esc(p.info)}</div></div>`:''}
+      
+      ${p.info?`<div><div class="pp-section-title">Información del Producto</div><div class="pp-info-box">${esc(p.info)}</div></div>`:''}
       <button class="share-btn" onclick="shareProduct(${p.id})">🔗 Compartir este producto</button>
     </div>`;
 
