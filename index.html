@@ -74,7 +74,8 @@
     .sub-pill{font-size:11px;padding:4px 10px;}
     .sub-pill::before{content:"↳ ";color:var(--neon-dim);}
     .cat-parent{font-weight:600;width:100%;}
-    .subcat-group{display:flex;flex-wrap:wrap;gap:5px;width:100%;padding-left:8px;border-left:2px solid var(--border);margin-top:2px;}
+    .subcat-group{display:none;flex-wrap:wrap;gap:5px;width:100%;padding-left:10px;border-left:2px solid rgba(57,255,20,0.25);margin-top:4px;margin-bottom:2px;}
+    .subcat-group.open{display:flex;}
 
     /* MAIN */
     .content-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
@@ -446,12 +447,16 @@ async function cargarProductos() {
 
 // ── URL ROUTING ─────────────────────────
 function handleURL() {
-  const hash = window.location.hash; // #producto-23
-  if (hash.startsWith('#producto-')) {
-    const id = parseInt(hash.replace('#producto-',''));
-    const p  = todos.find(x => x.id === id);
-    if (p) { showProductPage(p, false); return; }
+  const hash = window.location.hash.replace('#','');
+  if (!hash) { showCatalog(); return; }
+  // Try slug match first
+  let p = todos.find(x => slugify(x.nombre) === hash);
+  // Fallback: old numeric id format
+  if (!p && hash.startsWith('producto-')) {
+    const id = parseInt(hash.replace('producto-',''));
+    p = todos.find(x => x.id === id);
   }
+  if (p) { showProductPage(p, false); return; }
   showCatalog();
 }
 window.addEventListener('popstate', handleURL);
@@ -471,6 +476,7 @@ function limpiarTodo() {
   searchTerm  = '';
   document.getElementById('searchInput').value = '';
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.subcat-group').forEach(g => g.classList.remove('open'));
   aplicarFiltros();
 }
 
@@ -481,8 +487,14 @@ function showCatalog() {
   window.scrollTo(0,0);
 }
 
+function slugify(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+
 function showProductPage(p, pushState = true) {
-  if (pushState) history.pushState(null, '', `#producto-${p.id}`);
+  if (pushState) history.pushState({pid: p.id}, '', `#${slugify(p.nombre)}`);
   document.title = `${p.nombre} — GetFit Supplements`;
   document.getElementById('viewCatalog').style.display = 'none';
   document.getElementById('viewProduct').style.display = 'block';
@@ -531,7 +543,8 @@ function construirSidebar() {
     if (hasSubs) {
       // Category with subcategories: show parent pill + indented sub-pills
       html += `<span class="pill cat-parent" data-cat="${esc(cat)}" onclick="toggleCat('${esc(cat)}',this)">${esc(cat)} <small>(${nCat})</small></span>`;
-      html += `<div class="subcat-group">`;
+      const sgId = 'sg-'+esc(cat).replace(/[^a-z0-9]/gi,'_');
+      html += `<div class="subcat-group" id="${sgId}">`;
       [...subcats].sort().forEach(sub => {
         const nSub = todos.filter(p=>p.categoria===cat && p.subcategoria===sub).length;
         html += `<span class="pill sub-pill" data-cat="${esc(cat)}" data-sub="${esc(sub)}" onclick="toggleSubcat('${esc(cat)}','${esc(sub)}',this)">${esc(sub)} <small>(${nSub})</small></span>`;
@@ -567,16 +580,20 @@ function toggleFgroup(header) {
 let activeSubcats = {};
 
 function toggleCat(cat, pill) {
-  // clicking parent category: toggle entire category (all subcats or none)
+  const sgId = 'sg-'+cat.replace(/[^a-z0-9]/gi,'_');
+  const group = document.getElementById(sgId);
   if (activeCats.has(cat)) {
+    // deactivate: clear filter, collapse subcats
     activeCats.delete(cat);
-    if (activeSubcats[cat]) { activeSubcats[cat].clear(); }
+    if (activeSubcats[cat]) activeSubcats[cat].clear();
     pill.classList.remove('active');
-    // deselect sub-pills
     document.querySelectorAll(`.sub-pill[data-cat="${cat}"]`).forEach(sp => sp.classList.remove('active'));
+    if (group) group.classList.remove('open');
   } else {
+    // activate: filter this category, expand subcats to choose
     activeCats.add(cat);
     pill.classList.add('active');
+    if (group) group.classList.add('open');
   }
   aplicarFiltros();
 }
@@ -586,17 +603,23 @@ function toggleSubcat(cat, sub, pill) {
   if (activeSubcats[cat].has(sub)) {
     activeSubcats[cat].delete(sub);
     pill.classList.remove('active');
-    // if no subs active, also deactivate parent
+    // if no subs left, deactivate parent too and collapse
     if (activeSubcats[cat].size === 0) {
       activeCats.delete(cat);
       document.querySelectorAll(`.cat-parent[data-cat="${cat}"]`).forEach(p => p.classList.remove('active'));
+      const sgId = 'sg-'+cat.replace(/[^a-z0-9]/gi,'_');
+      const g = document.getElementById(sgId);
+      if (g) g.classList.remove('open');
     }
   } else {
     activeSubcats[cat].add(sub);
     pill.classList.add('active');
-    // auto-activate parent
+    // auto-activate parent + keep group open
     activeCats.add(cat);
     document.querySelectorAll(`.cat-parent[data-cat="${cat}"]`).forEach(p => p.classList.add('active'));
+    const sgId = 'sg-'+cat.replace(/[^a-z0-9]/gi,'_');
+    const g = document.getElementById(sgId);
+    if (g) g.classList.add('open');
   }
   aplicarFiltros();
 }
@@ -806,9 +829,11 @@ function renderProductPage(p) {
     <div class="pp-thumb ${i===0?'active':''}" id="thumb-${i}" onclick="ppSelectImg(${i},'${esc(u)}')">
       <img src="${esc(u)}" alt="${esc(p.nombre)}" loading="lazy">
     </div>`).join('');
+  // Store imgs in window for lightbox (avoids escaping issues in onclick)
+  window._ppImgs = p.imgs;
   const mainImg = p.imgs.length
-    ? `<img id="ppMainImg" src="${esc(p.imgs[0])}" alt="${esc(p.nombre)}" onclick="openLightbox(${JSON.stringify(p.imgs)},0)">`
-    : `<div class="fallback">💪</div>`;
+    ? `<img id="ppMainImg" src="${esc(p.imgs[0])}" alt="${esc(p.nombre)}" onclick="openLightbox(window._ppImgs, 0)" style="cursor:zoom-in">`
+    : `<div class="fallback" style="font-size:80px;display:flex;align-items:center;justify-content:center;height:100%">💪</div>`;
 
   // Tags
   let ptag='';
@@ -861,7 +886,11 @@ function renderProductPage(p) {
 }
 
 function ppSelectImg(idx, url) {
-  document.getElementById('ppMainImg').src = url;
+  const img = document.getElementById('ppMainImg');
+  if (img) {
+    img.src = url;
+    img.onclick = () => openLightbox(window._ppImgs, idx);
+  }
   document.querySelectorAll('.pp-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
 }
 function ppChangeQty(delta) {
@@ -877,7 +906,9 @@ function ppAgregar(pid) {
 }
 
 function shareProduct(pid) {
-  const url = window.location.origin+window.location.pathname+'#producto-'+pid;
+  const p = todos.find(x=>x.id===pid);
+  const slug = p ? slugify(p.nombre) : 'producto-'+pid;
+  const url = window.location.origin+window.location.pathname+'#'+slug;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link copiado al portapapeles'));
   } else {
