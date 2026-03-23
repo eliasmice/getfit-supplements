@@ -276,7 +276,7 @@
 
 <header>
   <div class="header-inner">
-    <a class="logo" onclick="goHome()">
+    <div class="logo" onclick="goHome()">
       <img class="logo-img" id="logoImg"
         src="https://drive.google.com/thumbnail?id=1uPfzn_J89fv5a81zDjs2klMpAQ0eH2sD&sz=w200"
         alt="GetFit" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'">
@@ -285,14 +285,14 @@
         <div class="logo-text">Get<span>Fit</span> Supplements</div>
         <div class="logo-sub">Puntarenas, Costa Rica</div>
       </div>
-    </a>
+    </div>
     <div class="header-right">
       <div class="search-bar">
-        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:.5">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:.5;pointer-events:none">
           <circle cx="6.5" cy="6.5" r="5" stroke="#e8f0e9" stroke-width="1.5"/>
           <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="#e8f0e9" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-        <input type="text" id="searchInput" placeholder="Buscar productos o marcas..." oninput="handleSearch()" onkeydown="if(event.key==='Escape'){this.value='';handleSearch();}">
+        <input type="search" id="searchInput" placeholder="Buscar productos o marcas..." autocomplete="off">
       </div>
       <button class="cart-btn" onclick="openCart()">
         🛒 Carrito
@@ -477,7 +477,7 @@ function limpiarTodo() {
   filterPromo = false;
   filterNuevo = false;
   searchTerm  = '';
-  document.getElementById('searchInput').value = '';
+  const si = document.getElementById('searchInput'); if(si) si.value = '';
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.subcat-group').forEach(g => g.classList.remove('open'));
   aplicarFiltros();
@@ -725,14 +725,7 @@ function removeFilter(type, val, sub) {
   aplicarFiltros();
 }
 
-function handleSearch(){
-  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-  // if on product page, go back to catalog first
-  if (document.getElementById('viewProduct').style.display !== 'none') {
-    showCatalog();
-  }
-  aplicarFiltros();
-}
+// search handled via addEventListener in DOMContentLoaded
 function sortProducts(v){ sortOrder=v; aplicarFiltros(); }
 
 // ── RENDER GRID ──────────────────────────
@@ -1034,6 +1027,21 @@ function enviarWhatsApp(){
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// Search input listener — attached in JS to avoid any HTML attribute issues
+document.addEventListener('DOMContentLoaded', function() {
+  const inp = document.getElementById('searchInput');
+  if (inp) {
+    inp.addEventListener('input', function() {
+      searchTerm = this.value.toLowerCase().trim();
+      if (document.getElementById('viewProduct').style.display !== 'none') showCatalog();
+      aplicarFiltros();
+    });
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { this.value = ''; searchTerm = ''; aplicarFiltros(); }
+    });
+  }
+});
 
 cargarProductos();
 </script>
