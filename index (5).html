@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GetFit Supplements — Entrená Fuerte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--neon:#39ff14;--neon-dim:#1a7a08;--bg:#080c0a;--bg2:#0e1510;--bg3:#141c16;--card:#111814;--border:#1e2d20;--text:#e8f0e9;--muted:#6b7c6e;--white:#fff;--promo:#ff6b35;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:var(--bg);}
+    ::-webkit-scrollbar-thumb{background:var(--neon-dim);border-radius:3px;}
+
+    .topbar{background:var(--neon);color:#000;text-align:center;padding:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;}
+
+    header{background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+    .header-inner{max-width:1400px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:70px;gap:16px;}
+    .logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
+    .logo-icon{width:46px;height:46px;background:var(--neon);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;}
+    .logo-text{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:21px;color:var(--white);line-height:1;text-transform:uppercase;}
+    .logo-text span{color:var(--neon);}
+    .logo-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;}
+    .header-right{display:flex;align-items:center;gap:12px;}
+    .search-bar{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;gap:8px;width:250px;transition:border-color 0.2s;}
+    .search-bar:focus-within{border-color:var(--neon);}
+    .search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;width:100%;}
+    .search-bar input::placeholder{color:var(--muted);}
+    .cart-btn{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 16px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:8px;font-family:'Barlow',sans-serif;font-size:14px;font-weight:500;transition:all 0.2s;white-space:nowrap;}
+    .cart-btn:hover{border-color:var(--neon);color:var(--neon);}
+    .cart-badge{position:absolute;top:-6px;right:-6px;background:var(--neon);color:#000;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center;}
+
+    .hero{background:var(--bg2);border-bottom:1px solid var(--border);padding:56px 24px;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:-80px;right:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(57,255,20,0.06) 0%,transparent 70%);pointer-events:none;}
+    .hero-inner{max-width:1400px;margin:0 auto;}
+    .hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(38px,5.5vw,68px);line-height:.95;text-transform:uppercase;color:var(--white);}
+    .hero h1 .accent{color:var(--neon);display:block;}
+    .hero p{margin-top:14px;color:var(--muted);font-size:15px;max-width:480px;line-height:1.6;}
+    .hero-badges{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+    .badge{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--muted);}
+    .dot{width:6px;height:6px;background:var(--neon);border-radius:50%;flex-shrink:0;}
+
+    .layout{max-width:1400px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:230px 1fr;gap:28px;}
+
+    .sidebar{position:sticky;top:86px;height:fit-content;}
+    .filter-section{margin-bottom:24px;}
+    .filter-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+    .filter-btn{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:1px solid transparent;color:var(--muted);padding:7px 10px;border-radius:7px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;text-align:left;transition:all 0.15s;margin-bottom:2px;}
+    .filter-btn:hover{background:var(--bg3);color:var(--text);}
+    .filter-btn.active{background:rgba(57,255,20,0.09);color:var(--neon);border-color:rgba(57,255,20,0.2);}
+    .count{font-size:11px;background:var(--bg3);border-radius:10px;padding:2px 7px;color:var(--muted);flex-shrink:0;}
+    .filter-btn.active .count{background:rgba(57,255,20,0.15);color:var(--neon);}
+
+    .content-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+    .content-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px;text-transform:uppercase;color:var(--white);}
+    .content-count{color:var(--muted);font-size:13px;margin-top:2px;}
+    .sort-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 14px;font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;outline:none;}
+
+    .skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+    .skeleton-img{width:100%;aspect-ratio:1;background:var(--bg3);animation:pulse 1.5s ease-in-out infinite;}
+    .skeleton-body{padding:13px;}
+    .skeleton-line{height:10px;background:var(--bg3);border-radius:4px;margin-bottom:8px;animation:pulse 1.5s ease-in-out infinite;}
+    .skeleton-line.s{width:50%;}.skeleton-line.m{width:75%;}
+    @keyframes pulse{0%,100%{opacity:.4}50%{opacity:.8}}
+
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;}
+
+    .product-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all 0.25s;}
+    .product-card:hover{border-color:rgba(57,255,20,0.3);transform:translateY(-3px);box-shadow:0 8px 32px rgba(57,255,20,0.07);}
+
+    .product-gallery{position:relative;width:100%;aspect-ratio:1;background:#f0f0f0;overflow:hidden;}
+    .gallery-slides{display:flex;width:100%;height:100%;transition:transform 0.3s ease;}
+    .gallery-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;flex-shrink:0;}
+    .gallery-slide img{width:100%;height:100%;object-fit:cover;}
+    .gallery-slide .fallback{font-size:52px;}
+    .gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:5;transition:background 0.15s;opacity:0;}
+    .product-card:hover .gallery-arrow{opacity:1;}
+    .gallery-arrow:hover{background:rgba(57,255,20,0.85);color:#000;}
+    .gallery-prev{left:6px;}.gallery-next{right:6px;}
+    .gallery-dots{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:5;}
+    .gallery-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.45);cursor:pointer;transition:background 0.15s;}
+    .gallery-dot.active{background:#fff;}
+
+    .brand-tag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.72);border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#bbb;z-index:3;}
+    .corner-tag{position:absolute;top:8px;right:8px;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;z-index:3;}
+    .tag-nuevo{background:var(--neon);color:#000;}
+    .tag-promo{background:var(--promo);color:#fff;}
+    .tag-agotado{background:#333;color:#777;}
+
+    .product-info{padding:12px;}
+    .product-category{font-size:10px;color:var(--neon);font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+    .product-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--white);line-height:1.2;margin-bottom:5px;}
+    .product-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:11px;min-height:33px;}
+    .product-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .product-price{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:19px;color:var(--neon);line-height:1;}
+    .product-price .cur{font-size:12px;font-weight:600;}
+    .price-original{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--muted);text-decoration:line-through;line-height:1;}
+    .price-promo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:19px;color:var(--promo);line-height:1;}
+    .price-promo .cur{font-size:12px;font-weight:600;}
+
+    .add-btn{background:var(--neon);color:#000;border:none;border-radius:8px;width:32px;height:32px;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+    .add-btn:hover{background:#fff;transform:scale(1.1);}
+    .add-btn:active{transform:scale(.95);}
+    .add-btn:disabled{background:#2a2a2a;color:#555;cursor:not-allowed;transform:none;}
+    .empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;padding:60px 20px;gap:12px;color:var(--muted);text-align:center;}
+    .empty-state .icon{font-size:48px;}
+
+    .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:none;backdrop-filter:blur(4px);}
+    .cart-overlay.open{display:block;}
+    .cart-drawer{position:fixed;right:0;top:0;width:380px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.3s ease;}
+    .cart-drawer.open{transform:translateX(0);}
+    .cart-header{padding:22px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .cart-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;color:var(--white);}
+    .close-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+    .close-btn:hover{border-color:var(--neon);color:var(--neon);}
+    .cart-items{flex:1;overflow-y:auto;padding:16px;}
+    .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:12px;}
+    .cart-empty .icon{font-size:48px;}
+    .cart-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;}
+    .cart-item-img{width:50px;height:50px;border-radius:8px;object-fit:cover;background:#f0f0f0;flex-shrink:0;}
+    .cart-item-info{flex:1;min-width:0;}
+    .cart-item-name{font-size:12px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .cart-item-brand{font-size:11px;color:var(--muted);}
+    .cart-item-price{font-size:13px;color:var(--neon);font-weight:700;margin-top:2px;}
+    .cart-item-price.promo{color:var(--promo);}
+    .cart-item-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color 0.15s;flex-shrink:0;}
+    .cart-item-remove:hover{color:#ff4444;}
+    .cart-footer{padding:20px 24px;border-top:1px solid var(--border);}
+    .cart-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+    .cart-total-label{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;font-weight:600;}
+    .cart-total-amount{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;color:var(--neon);}
+    .whatsapp-btn{width:100%;background:#25D366;color:#000;border:none;border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;}
+    .whatsapp-btn:hover{background:#128C7E;color:#fff;}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--neon);color:#000;padding:12px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;z-index:300;transition:transform 0.3s ease;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+
+    footer{background:var(--bg2);border-top:1px solid var(--border);margin-top:60px;padding:40px 24px;text-align:center;}
+    .footer-inner{max-width:1400px;margin:0 auto;}
+    .footer-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;text-transform:uppercase;color:var(--white);margin-bottom:8px;}
+    .footer-logo span{color:var(--neon);}
+    footer p{color:var(--muted);font-size:13px;margin-bottom:5px;}
+    .footer-links{display:flex;justify-content:center;gap:24px;margin-top:16px;flex-wrap:wrap;}
+    .footer-links a{color:var(--muted);text-decoration:none;font-size:13px;transition:color 0.15s;}
+    .footer-links a:hover{color:var(--neon);}
+
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr;}
+      .sidebar{position:static;}
+      .filter-section{display:flex;flex-wrap:wrap;gap:6px;}
+      .filter-title{width:100%;margin-bottom:2px;}
+      .filter-btn{width:auto;}
+      .cart-drawer{width:100%;}
+      .search-bar{width:160px;}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🚀 Entregas rápidas en Puntarenas &nbsp;·&nbsp; 📦 Envíos a todo el país &nbsp;·&nbsp; 📲 Pedidos por WhatsApp</div>
+
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">🦍</div>
+      <div>
+        <div class="logo-text">Get<span>Fit</span> Supplements</div>
+        <div class="logo-sub">Puntarenas, Costa Rica</div>
+      </div>
+    </a>
+    <div class="header-right">
+      <div class="search-bar">
+        <span style="color:var(--muted);font-size:15px">🔍</span>
+        <input type="text" id="searchInput" placeholder="Buscar productos o marcas..." oninput="handleSearch()">
+      </div>
+      <button class="cart-btn" onclick="openCart()">
+        🛒 Carrito
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Entrená fuerte.<br><span class="accent">Suplementate mejor.</span></h1>
+    <p>Las mejores marcas internacionales de suplementos deportivos en Costa Rica. Proteínas, creatinas, pre-entrenos y mucho más.</p>
+    <div class="hero-badges">
+      <div class="badge"><span class="dot"></span> Tienda virtual</div>
+      <div class="badge"><span class="dot"></span> Pedidos por WhatsApp</div>
+      <div class="badge"><span class="dot"></span> Envíos nacionales</div>
+      <div class="badge"><span class="dot"></span> +10 marcas premium</div>
+    </div>
+  </div>
+</section>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="filter-section" id="catSection">
+      <div class="filter-title">Categorías</div>
+      <button class="filter-btn active" onclick="filtrarCat('',this)">Todos <span class="count">…</span></button>
+    </div>
+    <div class="filter-section" id="brandSection">
+      <div class="filter-title">Marcas</div>
+      <button class="filter-btn active" onclick="filtrarMarca('',this)">Todas las marcas</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="content-header">
+      <div>
+        <div class="content-title" id="mainTitle">Todos los Productos</div>
+        <div class="content-count" id="mainCount">Cargando catálogo...</div>
+      </div>
+      <select class="sort-select" onchange="sortProducts(this.value)">
+        <option value="default">Ordenar por</option>
+        <option value="promo">Promociones primero</option>
+        <option value="price-asc">Precio: menor a mayor</option>
+        <option value="price-desc">Precio: mayor a menor</option>
+        <option value="name">Nombre A-Z</option>
+      </select>
+    </div>
+    <div class="product-grid" id="productGrid">
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line"></div></div></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Get<span>Fit</span> Supplements</div>
+    <p>Puntarenas, Costa Rica &nbsp;·&nbsp; Tienda virtual de suplementos y accesorios deportivos</p>
+    <p>📱 Pedidos y consultas por WhatsApp &nbsp;·&nbsp; 🚚 Envíos a todo el país</p>
+    <div class="footer-links">
+      <a href="https://www.instagram.com/getfitsupplements_/" target="_blank">📸 Instagram</a>
+      <a href="https://wa.me/50689754195" target="_blank">💬 WhatsApp</a>
+      <a href="https://getfitsupplement.myshopify.com" target="_blank">🛒 Tienda Online</a>
+    </div>
+  </div>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <div class="cart-title">Tu Pedido 🛒</div>
+    <button class="close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty"><div class="icon">🛒</div><p>Tu carrito está vacío</p></div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span class="cart-total-label">Total del pedido</span>
+      <span class="cart-total-amount" id="cartTotal">₡0</span>
+    </div>
+    <button class="whatsapp-btn" onclick="enviarWhatsApp()">📲 Pedir por WhatsApp</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5f4OoHkW89oIwT9nOULR1B0kNGGSTnfYQt3LNVxoM-b0uSHW8bGLpvzCP8XhPgvFBMLmn5Zp9TZq6/pub?gid=0&single=true&output=csv';
+const WHATSAPP  = '50689754195';
+
+let todos     = [];
+let filtrados = [];
+let activeCat   = '';
+let activeBrand = '';
+let searchTerm  = '';
+let sortOrder   = 'default';
+let carrito     = [];
+
+// ── CARGA DESDE GOOGLE SHEETS ─────────────────────────
+async function cargarProductos() {
+  try {
+    const res = await fetch(SHEET_URL);
+    if (!res.ok) throw new Error('No se pudo conectar al catálogo');
+    const csv = await res.text();
+    todos = parsearCSV(csv);
+    inicializar();
+  } catch(e) {
+    document.getElementById('mainCount').textContent = 'Error al cargar el catálogo';
+    document.getElementById('productGrid').innerHTML =
+      `<div class="empty-state"><div class="icon">⚠️</div><p>${e.message}</p></div>`;
+    console.error(e);
+  }
+}
+
+// ── PARSEAR CSV ───────────────────────────────────────
+function parsearCSV(csv) {
+  const lineas = csv.trim().split('\n');
+  const headers = lineas[0].split(',').map(h => h.trim().replace(/"/g,'').toLowerCase());
+  return lineas.slice(1).map(linea => {
+    const cols = []; let cur = '', q = false;
+    for (const c of linea) {
+      if (c==='"') q=!q;
+      else if (c===',' && !q) { cols.push(cur.trim()); cur=''; }
+      else cur+=c;
+    }
+    cols.push(cur.trim());
+    const o = {};
+    headers.forEach((h,i) => o[h] = (cols[i]||'').replace(/^"|"$/g,'').trim());
+    return {
+      nombre:      o.nombre      || '',
+      marca:       o.marca       || '',
+      precio:      parseInt(o.precio)      || 0,
+      precio_promo:parseInt(o.precio_promo)|| 0,
+      categoria:   o.categoria   || 'Suplementos',
+      descripcion: o.descripcion || '',
+      imagen1:     o.imagen1     || '',
+      imagen2:     o.imagen2     || '',
+      imagen3:     o.imagen3     || '',
+      imagen4:     o.imagen4     || '',
+      disponible:  (o.disponible ||'si').toLowerCase() !== 'no',
+      nuevo:       (o.nuevo      ||'no').toLowerCase() === 'si',
+    };
+  }).filter(p => p.nombre);
+}
+
+// ── INICIALIZAR ───────────────────────────────────────
+function inicializar() {
+  todos = todos.map((p, i) => ({
+    ...p,
+    id:   i,
+    imgs: [p.imagen1,p.imagen2,p.imagen3,p.imagen4].filter(Boolean),
+  }));
+  construirSidebar();
+  aplicarFiltros();
+}
+
+// ── SIDEBAR DINÁMICO ──────────────────────────────────
+function construirSidebar() {
+  const cats   = [...new Set(todos.map(p=>p.categoria))].sort();
+  const marcas = [...new Set(todos.map(p=>p.marca))].sort();
+
+  document.getElementById('catSection').innerHTML =
+    `<div class="filter-title">Categorías</div>
+     <button class="filter-btn active" onclick="filtrarCat('',this)">
+       Todos <span class="count">${todos.length}</span>
+     </button>
+     ${cats.map(c=>`
+       <button class="filter-btn" onclick="filtrarCat('${esc(c)}',this)">
+         ${esc(c)} <span class="count">${todos.filter(p=>p.categoria===c).length}</span>
+       </button>`).join('')}`;
+
+  document.getElementById('brandSection').innerHTML =
+    `<div class="filter-title">Marcas</div>
+     <button class="filter-btn active" onclick="filtrarMarca('',this)">Todas las marcas</button>
+     ${marcas.map(m=>`
+       <button class="filter-btn" onclick="filtrarMarca('${esc(m)}',this)">${esc(m)}</button>`
+     ).join('')}`;
+}
+
+// ── FILTROS ───────────────────────────────────────────
+const pFinal = p => p.precio_promo || p.precio;
+
+function aplicarFiltros() {
+  let lista = [...todos];
+  if (activeCat)   lista = lista.filter(p => p.categoria === activeCat);
+  if (activeBrand) lista = lista.filter(p => p.marca     === activeBrand);
+  if (searchTerm)  lista = lista.filter(p =>
+    p.nombre.toLowerCase().includes(searchTerm) ||
+    p.marca.toLowerCase().includes(searchTerm)  ||
+    p.categoria.toLowerCase().includes(searchTerm)
+  );
+  if (sortOrder==='price-asc')  lista.sort((a,b) => pFinal(a)-pFinal(b));
+  if (sortOrder==='price-desc') lista.sort((a,b) => pFinal(b)-pFinal(a));
+  if (sortOrder==='name')       lista.sort((a,b) => a.nombre.localeCompare(b.nombre));
+  if (sortOrder==='promo')      lista.sort((a,b) => (b.precio_promo?1:0)-(a.precio_promo?1:0));
+  filtrados = lista;
+  renderProductos();
+}
+
+function filtrarCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('#catSection .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mainTitle').textContent = cat || 'Todos los Productos';
+  aplicarFiltros();
+}
+function filtrarMarca(marca, btn) {
+  activeBrand = marca;
+  document.querySelectorAll('#brandSection .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  aplicarFiltros();
+}
+function handleSearch() {
+  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+  aplicarFiltros();
+}
+function sortProducts(val) { sortOrder=val; aplicarFiltros(); }
+
+// ── RENDER ────────────────────────────────────────────
+function renderProductos() {
+  const grid  = document.getElementById('productGrid');
+  const count = document.getElementById('mainCount');
+  count.textContent = filtrados.length + ' producto' + (filtrados.length!==1?'s':'');
+
+  if (!filtrados.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>No se encontraron productos.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtrados.map((p, fi) => {
+    const tienePromo = !!p.precio_promo;
+    const precioStr  = p.precio.toLocaleString('es-CR',{maximumFractionDigits:0});
+    const promoStr   = tienePromo ? p.precio_promo.toLocaleString('es-CR',{maximumFractionDigits:0}) : '';
+    const multiImg   = p.imgs.length > 1;
+
+    const slides = p.imgs.length
+      ? p.imgs.map(url=>`
+          <div class="gallery-slide">
+            <img src="${esc(url)}" alt="${esc(p.nombre)}" loading="lazy"
+              onerror="this.parentNode.innerHTML='<span class=\\'fallback\\'>💪</span>'">
+          </div>`).join('')
+      : `<div class="gallery-slide"><span class="fallback">💪</span></div>`;
+
+    const arrows = multiImg ? `
+      <button class="gallery-arrow gallery-prev" onclick="slideImg(event,${fi},-1)">‹</button>
+      <button class="gallery-arrow gallery-next" onclick="slideImg(event,${fi},1)">›</button>` : '';
+
+    const dots = multiImg ? `
+      <div class="gallery-dots" id="dots-${fi}">
+        ${p.imgs.map((_,di)=>`<div class="gallery-dot${di===0?' active':''}" onclick="goSlide(event,${fi},${di})"></div>`).join('')}
+      </div>` : '';
+
+    let cornerTag = '';
+    if (!p.disponible)   cornerTag = `<div class="corner-tag tag-agotado">Agotado</div>`;
+    else if (tienePromo) cornerTag = `<div class="corner-tag tag-promo">¡Oferta!</div>`;
+    else if (p.nuevo)    cornerTag = `<div class="corner-tag tag-nuevo">Nuevo</div>`;
+
+    const precioHTML = tienePromo
+      ? `<div class="price-original"><span class="cur">₡</span>${precioStr}</div>
+         <div class="price-promo"><span class="cur">₡</span>${promoStr}</div>`
+      : `<div class="product-price"><span class="cur">₡</span>${precioStr}</div>`;
+
+    return `
+    <div class="product-card">
+      <div class="product-gallery">
+        <div class="gallery-slides" id="slides-${fi}">${slides}</div>
+        ${arrows}${dots}
+        <div class="brand-tag">${esc(p.marca)}</div>
+        ${cornerTag}
+      </div>
+      <div class="product-info">
+        <div class="product-category">${esc(p.categoria)}</div>
+        <div class="product-name">${esc(p.nombre)}</div>
+        <div class="product-desc">${esc(p.descripcion)}</div>
+        <div class="product-footer">
+          <div>${precioHTML}</div>
+          <button class="add-btn" onclick="agregar(${fi})" ${!p.disponible?'disabled':''}>
+            ${p.disponible?'+':'—'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  window._gPos = {};
+}
+
+// ── GALERÍA ───────────────────────────────────────────
+function slideImg(e, fi, dir) {
+  e.stopPropagation();
+  const p = filtrados[fi]; if (!p||p.imgs.length<=1) return;
+  window._gPos = window._gPos||{};
+  const cur = (((window._gPos[fi]||0)+dir) + p.imgs.length) % p.imgs.length;
+  window._gPos[fi] = cur;
+  applySlide(fi, cur);
+}
+function goSlide(e, fi, idx) {
+  e.stopPropagation();
+  window._gPos = window._gPos||{};
+  window._gPos[fi] = idx;
+  applySlide(fi, idx);
+}
+function applySlide(fi, cur) {
+  const s = document.getElementById('slides-'+fi);
+  if (s) s.style.transform = `translateX(-${cur*100}%)`;
+  const d = document.getElementById('dots-'+fi);
+  if (d) d.querySelectorAll('.gallery-dot').forEach((dot,i)=>dot.classList.toggle('active',i===cur));
+}
+
+// ── CARRITO ───────────────────────────────────────────
+function agregar(fi) {
+  const p = filtrados[fi];
+  if (!p||!p.disponible) return;
+  carrito.push({...p, uid: Date.now()+Math.random()});
+  renderCarrito();
+  showToast('✅ ' + p.nombre + ' agregado');
+}
+function eliminar(uid) {
+  carrito = carrito.filter(p=>p.uid!==uid);
+  renderCarrito();
+}
+function renderCarrito() {
+  const badge = document.getElementById('cartBadge');
+  const total = carrito.reduce((s,p)=>s+pFinal(p),0);
+  badge.style.display = carrito.length?'flex':'none';
+  badge.textContent   = carrito.length;
+  document.getElementById('cartTotal').textContent = '₡'+total.toLocaleString('es-CR',{maximumFractionDigits:0});
+  const c = document.getElementById('cartItems');
+  if (!carrito.length) {
+    c.innerHTML=`<div class="cart-empty"><div class="icon">🛒</div><p>Tu carrito está vacío</p></div>`;
+    return;
+  }
+  c.innerHTML = carrito.map(p => {
+    const pf    = pFinal(p);
+    const thumb = p.imgs?.[0]||'';
+    return `
+    <div class="cart-item">
+      ${thumb
+        ?`<img class="cart-item-img" src="${esc(thumb)}" alt="${esc(p.nombre)}" onerror="this.style.display='none'">`
+        :`<div class="cart-item-img" style="background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px">💪</div>`}
+      <div class="cart-item-info">
+        <div class="cart-item-name">${esc(p.nombre)}</div>
+        <div class="cart-item-brand">${esc(p.marca)}</div>
+        <div class="cart-item-price ${p.precio_promo?'promo':''}">₡${pf.toLocaleString('es-CR',{maximumFractionDigits:0})}</div>
+      </div>
+      <button class="cart-item-remove" onclick="eliminar(${p.uid})">✕</button>
+    </div>`;
+  }).join('');
+}
+function openCart()  { document.getElementById('cartOverlay').classList.add('open');    document.getElementById('cartDrawer').classList.add('open'); }
+function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartDrawer').classList.remove('open'); }
+function enviarWhatsApp() {
+  if (!carrito.length) { showToast('⚠️ Agrega productos primero'); return; }
+  let msg='Hola! Quiero hacer este pedido:%0A%0A', total=0;
+  carrito.forEach(p=>{
+    const pf=pFinal(p);
+    msg+=`- ${p.nombre} (${p.marca}) %E2%82%A1${pf.toLocaleString('es-CR',{maximumFractionDigits:0})}%0A`;
+    total+=pf;
+  });
+  msg+=`%0A*Total: %E2%82%A1${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*%0A%0AMuchas gracias! %F0%9F%99%8F`;
+  window.open(`https://wa.me/${WHATSAPP}?text=${msg}`);
+}
+
+// ── UTILS ─────────────────────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+cargarProductos();
+</script>
+</body>
+</html>
