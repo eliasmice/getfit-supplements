@@ -54,6 +54,21 @@
     /* ── SIDEBAR ── */
     .sidebar{position:sticky;top:86px;height:fit-content;display:flex;flex-direction:column;gap:20px;}
 
+    /* Filter FAB — only visible on mobile */
+    .filter-fab{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:180;background:var(--neon);color:#000;border:none;border-radius:24px;padding:12px 24px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:1px;cursor:pointer;box-shadow:0 4px 20px rgba(57,255,20,.35);align-items:center;gap:8px;white-space:nowrap;}
+    .filter-fab:active{transform:translateX(-50%) scale(.96);}
+
+    /* Sidebar drawer overlay — mobile */
+    .sidebar-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:220;display:none;backdrop-filter:blur(3px);}
+    .sidebar-drawer-overlay.open{display:block;}
+    .sidebar-drawer{position:fixed;bottom:0;left:0;right:0;max-height:85vh;background:var(--bg2);border-radius:16px 16px 0 0;z-index:221;display:none;flex-direction:column;transform:translateY(100%);transition:transform .3s ease;}
+    .sidebar-drawer.open{transform:translateY(0);}
+    .sidebar-drawer-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+    .sidebar-drawer-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:20px;text-transform:uppercase;color:var(--white);}
+    .sidebar-drawer-body{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;}
+    .sidebar-drawer-footer{padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+    .apply-filters-btn{width:100%;background:var(--neon);color:#000;border:none;border-radius:10px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+
     /* Filter group */
     .fgroup{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
     .fgroup-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none;transition:background .15s;}
@@ -266,13 +281,95 @@
     .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--neon);color:#000;padding:12px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;z-index:600;transition:transform .3s ease;white-space:nowrap;}
     .toast.show{transform:translateX(-50%) translateY(0);}
 
-    @media(max-width:1000px){
+
+    /* ══════════════════════════════
+       TABLET  ≤ 900px
+    ══════════════════════════════ */
+    @media(max-width:900px){
       .layout{grid-template-columns:1fr;}
-      .sidebar{position:static;}
+      .sidebar{position:static;display:none;} /* hidden — opens as drawer on mobile */
       .product-page{grid-template-columns:1fr;}
       .pp-gallery{position:static;}
       .cart-drawer{width:100%;}
-      .search-bar{width:160px;}
+      .search-bar{width:200px;}
+      .product-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}
+    }
+
+    /* ══════════════════════════════
+       MOBILE  ≤ 600px
+    ══════════════════════════════ */
+    @media(max-width:600px){
+
+      /* Topbar */
+      .topbar{font-size:11px;padding:6px 12px;}
+
+      /* Header */
+      .header-inner{padding:0 14px;height:60px;gap:10px;}
+      .logo-text{font-size:17px;}
+      .logo-sub{display:none;}
+      .logo-img{height:36px;}
+      .logo-fallback{width:36px;height:36px;font-size:18px;}
+      .search-bar{width:0;padding:8px;overflow:hidden;transition:width .25s,padding .25s;}
+      .search-bar.expanded{width:160px;padding:8px 12px;}
+      .search-bar input{font-size:13px;}
+      .cart-btn{padding:8px 12px;font-size:13px;}
+
+      /* Filter button */
+      .filter-fab{display:flex;}
+
+      /* Sidebar drawer */
+      .sidebar-drawer{display:flex;}
+
+      /* Hero */
+      .hero{padding:36px 16px;min-height:220px;}
+      .hero h1{font-size:32px;}
+      .hero p{font-size:13px;max-width:100%;}
+      .hero-badges{gap:6px;}
+      .hbadge{font-size:11px;padding:4px 10px;}
+
+      /* Layout */
+      .layout{padding:16px 12px;gap:16px;}
+      .content-header{margin-bottom:14px;}
+      .content-title{font-size:20px;}
+      .sort-select{font-size:12px;padding:6px 10px;}
+
+      /* Product grid — 2 columns */
+      .product-grid{grid-template-columns:1fr 1fr;gap:10px;}
+      .product-name{font-size:13px;}
+      .product-desc{display:none;} /* hide desc on mobile cards */
+      .product-info{padding:9px;}
+      .product-category{font-size:9px;}
+      .product-price{font-size:16px;}
+      .price-promo{font-size:16px;}
+      .price-original{font-size:11px;}
+      .cq-btn{width:24px;height:24px;font-size:14px;}
+      .cq-num{width:24px;height:24px;font-size:13px;}
+
+      /* Product page */
+      #viewProduct{padding:14px 12px;}
+      .back-btn{padding:7px 12px;font-size:12px;margin-bottom:18px;}
+      .product-page{gap:20px;}
+      .pp-main-img{border-radius:12px;}
+      .pp-thumb{width:56px;height:56px;}
+      .pp-name{font-size:26px;}
+      .pp-price{font-size:28px;}
+      .pp-price-promo{font-size:28px;}
+      .pp-add-btn{font-size:14px;height:44px;}
+      .pp-info{gap:10px;}
+      .pp-info-box{font-size:12px;padding:12px;}
+
+      /* Cart */
+      .cart-drawer{width:100%;border-radius:16px 16px 0 0;top:auto;bottom:0;height:90vh;transform:translateY(100%);}
+      .cart-drawer.open{transform:translateY(0);}
+      .cart-header{padding:16px 18px;}
+      .cart-title{font-size:18px;}
+
+      /* Active filters */
+      .active-filters{gap:5px;}
+      .af-chip{font-size:11px;padding:3px 8px;}
+
+      /* Toast */
+      .toast{font-size:13px;padding:10px 18px;bottom:80px;}
     }
   </style>
 </head>
@@ -289,11 +386,11 @@
       <div class="logo-fallback" id="logoFb">🦍</div>
       <div>
         <div class="logo-text">Get<span>Fit</span> Supplements</div>
-        <div class="logo-sub">Costa Rica</div>
+        <div class="logo-sub">Puntarenas, Costa Rica</div>
       </div>
     </div>
     <div class="header-right">
-      <div class="search-bar">
+      <div class="search-bar" id="mobileSearchBar">
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;opacity:.5;pointer-events:none">
           <circle cx="6.5" cy="6.5" r="5" stroke="#e8f0e9" stroke-width="1.5"/>
           <line x1="10.5" y1="10.5" x2="14" y2="14" stroke="#e8f0e9" stroke-width="1.5" stroke-linecap="round"/>
@@ -364,11 +461,11 @@
     <img class="footer-logo-img"
       src="https://drive.google.com/thumbnail?id=1uPfzn_J89fv5a81zDjs2klMpAQ0eH2sD&sz=w300"
       alt="GetFit" onerror="this.style.display='none'">
-    <p>Costa Rica &nbsp;·&nbsp; Tienda virtual de suplementos y accesorios deportivos</p>
+    <p>Puntarenas, Costa Rica &nbsp;·&nbsp; Tienda virtual de suplementos y accesorios deportivos</p>
     <p>📱 Pedidos y consultas por WhatsApp &nbsp;·&nbsp; 🚚 Envíos a todo el país</p>
     <div class="footer-links">
       <a href="https://www.instagram.com/getfitsupplements_/" target="_blank">📸 Instagram</a>
-      <a href="https://wa.me/50689222123" target="_blank">💬 WhatsApp</a>
+      <a href="https://wa.me/50689754195" target="_blank">💬 WhatsApp</a>
     </div>
   </div>
 </footer>
@@ -400,10 +497,28 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MOBILE FILTER FAB -->
+<button class="filter-fab" id="filterFab" onclick="openFilterDrawer()">
+  ⚙️ Filtrar productos
+</button>
+
+<!-- MOBILE FILTER DRAWER -->
+<div class="sidebar-drawer-overlay" id="filterOverlay" onclick="closeFilterDrawer()"></div>
+<div class="sidebar-drawer" id="filterDrawer">
+  <div class="sidebar-drawer-header">
+    <div class="sidebar-drawer-title">Filtrar</div>
+    <button class="close-btn" onclick="closeFilterDrawer()">✕</button>
+  </div>
+  <div class="sidebar-drawer-body" id="filterDrawerBody"></div>
+  <div class="sidebar-drawer-footer">
+    <button class="apply-filters-btn" onclick="closeFilterDrawer()">Ver resultados</button>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════
 const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
-const WHATSAPP  = '89222123';
+const WHATSAPP  = '50689754195';
 
 // ═══════════════════════════════════════
 
@@ -679,6 +794,7 @@ function aplicarFiltros() {
   if (sortOrder==='name')       lista.sort((a,b)=>a.nombre.localeCompare(b.nombre));
   if (sortOrder==='promo')      lista.sort((a,b)=>(b.precio_promo?1:0)-(a.precio_promo?1:0));
   filtrados = lista;
+  updateFilterFab();
 
   // title
   const parts = [];
@@ -1094,7 +1210,7 @@ function enviarWhatsApp(){
     msg+=`- ${it.qty}x ${it.nombre}${variante} · ₡${(pf*it.qty).toLocaleString('es-CR',{maximumFractionDigits:0})}\n`;
     total+=pf*it.qty;
   });
-  msg+=`\n*Total: ₡${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*\n\nMuchas gracias!`;
+  msg+=`\n*Total: ₡${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*\n\nMuchas gracias! 🙏`;
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
 }
 
@@ -1102,6 +1218,55 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 // Search input listener — attached in JS to avoid any HTML attribute issues
+// ── MOBILE SEARCH TOGGLE ──
+function toggleSearch() {
+  const sb = document.getElementById('mobileSearchBar') || document.querySelector('.search-bar');
+  if (sb) sb.classList.toggle('expanded');
+  const inp = document.getElementById('searchInput');
+  if (inp && document.querySelector('.search-bar.expanded')) setTimeout(()=>inp.focus(),200);
+}
+
+// ── MOBILE FILTER DRAWER ──
+function openFilterDrawer() {
+  const body = document.getElementById('filterDrawerBody');
+  // Clone sidebar content into drawer
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar && body) body.innerHTML = sidebar.innerHTML;
+  // Re-apply active states
+  document.querySelectorAll('#filterDrawerBody .pill').forEach(pill => {
+    const cat   = pill.dataset.cat;
+    const brand = pill.dataset.brand;
+    const sub   = pill.dataset.sub;
+    if (cat && !sub && activeCats.has(cat))    pill.classList.add('active');
+    if (brand && activeBrands.has(brand))       pill.classList.add('active');
+    if (sub && activeSubcats[cat]?.has(sub))    pill.classList.add('active');
+    if (pill.classList.contains('promo-pill') && filterPromo) pill.classList.add('active');
+    if (pill.textContent.includes('Nuevos') && filterNuevo)   pill.classList.add('active');
+    // Open subcat groups if parent is active
+    const sgId = 'sg-'+(cat||'').replace(/[^a-z0-9]/gi,'_');
+    const g = document.getElementById(sgId);
+    if (g && activeCats.has(cat)) g.classList.add('open');
+  });
+  // Update badge count
+  updateFilterFab();
+  document.getElementById('filterOverlay').classList.add('open');
+  document.getElementById('filterDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFilterDrawer() {
+  document.getElementById('filterOverlay').classList.remove('open');
+  document.getElementById('filterDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+  updateFilterFab();
+}
+
+function updateFilterFab() {
+  const n = activeCats.size + activeBrands.size + (filterPromo?1:0) + (filterNuevo?1:0);
+  const fab = document.getElementById('filterFab');
+  if (fab) fab.textContent = n > 0 ? `⚙️ Filtros (${n} activos)` : '⚙️ Filtrar productos';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const inp = document.getElementById('searchInput');
   if (inp) {
