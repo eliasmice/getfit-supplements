@@ -1094,7 +1094,7 @@ function enviarWhatsApp(){
     msg+=`- ${it.qty}x ${it.nombre}${variante} · ₡${(pf*it.qty).toLocaleString('es-CR',{maximumFractionDigits:0})}\n`;
     total+=pf*it.qty;
   });
-  msg+=`\n*Total: ₡${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*\n\nMuchas gracias! 🙏`;
+  msg+=`\n*Total: ₡${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*\n\nMuchas gracias!`;
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
 }
 
