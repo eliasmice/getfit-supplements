@@ -199,6 +199,12 @@
     .pp-add-btn:disabled{background:#2a2a2a;color:#555;cursor:not-allowed;}
     .pp-agotado{text-align:center;color:#777;font-size:14px;padding:14px;background:#1a1a1a;border-radius:10px;}
     .pp-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .variant-block{display:flex;flex-direction:column;gap:10px;}
+    .variant-row{display:flex;flex-direction:column;gap:6px;}
+    .variant-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+    .variant-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-family:'Barlow',sans-serif;font-size:14px;cursor:pointer;outline:none;width:100%;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7c6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+    .variant-select:focus{border-color:var(--neon);}
+    .variant-select option{background:var(--bg2);}
     .pp-desc{font-size:14px;color:var(--text);line-height:1.8;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;}
     .pp-info-box{font-size:13px;color:var(--text);line-height:1.9;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;white-space:pre-wrap;}
     .share-btn{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;transition:all .15s;font-family:'Barlow',sans-serif;width:fit-content;}
@@ -434,6 +440,8 @@ async function cargarProductos() {
       imagen2:      (row.imagen2      ||'').trim(),
       imagen3:      (row.imagen3      ||'').trim(),
       imagen4:      (row.imagen4      ||'').trim(),
+      sabores:      (row.sabores      ||'').trim(),
+      tamanios:     (row.tamanios     ||'').trim(),
       disponible:   (row.disponible   ||'si').toLowerCase() !== 'no',
       nuevo:        (row.nuevo        ||'no').toLowerCase() === 'si',
     })).filter(p => p.nombre)
@@ -804,9 +812,15 @@ function applyCardSlide(fi) {
 // ── QTY ON CARD (fixed: uses data-pid) ───
 function cambiarQty(pid, delta) {
   const p = todos.find(x=>x.id===pid); if(!p||!p.disponible) return;
-  carrito[pid] = Math.max(0,(carrito[pid]||0)+delta);
-  if (carrito[pid]===0) delete carrito[pid];
-  const qty = carrito[pid]||0;
+  const cartKey = String(pid);
+  // if product has variants, open product page instead of direct add
+  if (delta > 0 && (p.sabores || p.tamanios)) {
+    showProductPage(p); showToast('Elegí sabor y tamaño 👆'); return;
+  }
+  if (!carrito[cartKey]) carrito[cartKey] = { pid, qty:0, nombre:p.nombre, marca:p.marca, precio:p.precio, precio_promo:p.precio_promo, imgs:p.imgs, variante:'' };
+  carrito[cartKey].qty = Math.max(0, carrito[cartKey].qty + delta);
+  if (carrito[cartKey].qty === 0) delete carrito[cartKey];
+  const qty = carrito[cartKey]?.qty || 0;
   // update all elements with data-pid (unique)
   document.querySelectorAll(`[data-pid="${pid}"]`).forEach(el => {
     if (el.classList.contains('cq-num'))              el.textContent = qty;
@@ -853,9 +867,37 @@ function renderProductPage(p) {
        <div class="pp-saving">Ahorrás ₡${saving}</div>`
     : `<div class="pp-price">₡${pStr}</div>`;
 
+  // Variants
+  const sabores  = p.sabores  ? p.sabores.split('|').map(s=>s.trim()).filter(Boolean)  : [];
+  const tamanios = p.tamanios ? p.tamanios.split('|').map(s=>s.trim()).filter(Boolean) : [];
+  let variantHTML = '';
+  if (sabores.length || tamanios.length) {
+    variantHTML = '<div class="variant-block">';
+    if (sabores.length) {
+      variantHTML += `<div class="variant-row">
+        <div class="variant-label">Sabor</div>
+        <select class="variant-select" id="ppSabor">
+          <option value="">Elige un sabor</option>
+          ${sabores.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    if (tamanios.length) {
+      variantHTML += `<div class="variant-row">
+        <div class="variant-label">Tamaño</div>
+        <select class="variant-select" id="ppTamanio">
+          <option value="">Elige un tamaño</option>
+          ${tamanios.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('')}
+        </select>
+      </div>`;
+    }
+    variantHTML += '</div>';
+  }
+
   // Footer
   const footer = p.disponible
-    ? `<div class="pp-qty-row">
+    ? `${variantHTML}
+       <div class="pp-qty-row">
          <span class="pp-qty-label">Cantidad:</span>
          <div class="pp-qty-ctrl">
            <button class="ppq-btn minus" onclick="ppChangeQty(-1)">−</button>
@@ -901,11 +943,27 @@ function ppChangeQty(delta) {
   const n=document.getElementById('ppQtyNum'); if(n) n.textContent=ppQty;
 }
 function ppAgregar(pid) {
-  const p=todos.find(x=>x.id===pid); if(!p||!p.disponible) return;
-  carrito[pid]=(carrito[pid]||0)+ppQty;
+  const p = todos.find(x=>x.id===pid); if(!p||!p.disponible) return;
+  // Read selected variants
+  const saborEl   = document.getElementById('ppSabor');
+  const tamanioEl = document.getElementById('ppTamanio');
+  const sabor     = saborEl   ? saborEl.value   : '';
+  const tamanio   = tamanioEl ? tamanioEl.value  : '';
+  // Validate required selections
+  if (saborEl   && !sabor)   { showToast('⚠️ Seleccioná un sabor primero');   return; }
+  if (tamanioEl && !tamanio) { showToast('⚠️ Seleccioná un tamaño primero');  return; }
+  // Build variant key so same product with diff variants = separate cart entries
+  const varKey  = [sabor, tamanio].filter(Boolean).join(' · ');
+  const cartKey = pid + (varKey ? '_'+varKey : '');
+  if (!carrito[cartKey]) {
+    carrito[cartKey] = { pid, qty: 0, nombre: p.nombre, marca: p.marca,
+      precio: p.precio, precio_promo: p.precio_promo,
+      imgs: p.imgs, variante: varKey };
+  }
+  carrito[cartKey].qty += ppQty;
   syncCardBadge(pid);
   renderCarrito();
-  showToast(`✅ ${ppQty}x ${p.nombre} agregado`);
+  showToast(`✅ ${ppQty}x ${p.nombre}${varKey?' ('+varKey+')':''} agregado`);
 }
 
 function shareProduct(pid) {
@@ -946,7 +1004,7 @@ function lbSlide(dir) {
 
 // ── CART ─────────────────────────────────
 function syncCardBadge(pid) {
-  const qty=carrito[pid]||0;
+  const qty = Object.values(carrito).filter(it=>it.pid===pid).reduce((s,it)=>s+it.qty,0);
   document.querySelectorAll(`[data-pid="${pid}"]`).forEach(el=>{
     if(el.classList.contains('cq-num'))  el.textContent=qty;
     if(el.classList.contains('cib-num')) el.textContent=qty;
@@ -957,69 +1015,84 @@ function syncCardBadge(pid) {
 }
 
 function renderCarrito() {
-  const badge = document.getElementById('cartBadge');
-  const totalQ = Object.values(carrito).reduce((s,q)=>s+q,0);
-  const totalP = Object.entries(carrito).reduce((s,[id,q])=>{const p=todos.find(x=>x.id==id);return s+(p?pFinal(p)*q:0);},0);
-  badge.style.display=totalQ>0?'flex':'none';
-  badge.textContent=totalQ;
-  const container=document.getElementById('cartItems');
-  const summary=document.getElementById('cartSummary');
-  if(!totalQ){
+  const badge    = document.getElementById('cartBadge');
+  const items    = Object.values(carrito);
+  const totalQ   = items.reduce((s,it)=>s+it.qty,0);
+  const pf2      = it => (it.precio_promo||it.precio);
+  const totalP   = items.reduce((s,it)=>s+(pf2(it)*it.qty),0);
+  badge.style.display = totalQ>0?'flex':'none';
+  badge.textContent   = totalQ;
+  const container = document.getElementById('cartItems');
+  const summary   = document.getElementById('cartSummary');
+  if (!totalQ) {
     container.innerHTML=`<div class="cart-empty"><div class="icon">🛒</div><p>Tu carrito está vacío</p></div>`;
     summary.innerHTML=`<div class="cs-row"><span>Total</span><span>₡0</span></div>`;
     return;
   }
-  container.innerHTML=Object.entries(carrito).map(([id,qty])=>{
-    const p=todos.find(x=>x.id==id); if(!p) return '';
-    const pf=(pFinal(p)*qty).toLocaleString('es-CR',{maximumFractionDigits:0});
-    const unit=pFinal(p).toLocaleString('es-CR',{maximumFractionDigits:0});
-    const thumb=p.imgs[0]||'';
+  container.innerHTML = items.map(it => {
+    const p     = todos.find(x=>x.id===it.pid);
+    const pfVal = pf2(it);
+    const subStr= (pfVal*it.qty).toLocaleString('es-CR',{maximumFractionDigits:0});
+    const unitStr=pfVal.toLocaleString('es-CR',{maximumFractionDigits:0});
+    const thumb = it.imgs?.[0]||'';
+    const key   = JSON.stringify(Object.keys(carrito).find(k=>carrito[k]===it));
     return `<div class="cart-item">
       <div class="ci-top">
-        ${thumb?`<img class="ci-img" src="${esc(thumb)}" alt="${esc(p.nombre)}" onerror="this.style.display='none'" onclick="closeCart();showProductPage(todos.find(x=>x.id==${id}))">`:`<div class="ci-img-fb">💪</div>`}
+        ${thumb?`<img class="ci-img" src="${esc(thumb)}" alt="${esc(it.nombre)}" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
         <div class="ci-info">
-          <div class="ci-name" onclick="closeCart();showProductPage(todos.find(x=>x.id==${id}))">${esc(p.nombre)}</div>
-          <div class="ci-brand">${esc(p.marca)}</div>
-          <div class="ci-unit">₡${unit} c/u</div>
+          <div class="ci-name">${esc(it.nombre)}</div>
+          <div class="ci-brand">${esc(it.marca)}${it.variante?` · <span style="color:var(--neon)">${esc(it.variante)}</span>`:''}</div>
+          <div class="ci-unit">₡${unitStr} c/u</div>
         </div>
-        <div class="ci-sub ${p.precio_promo?'promo':''}">₡${pf}</div>
+        <div class="ci-sub ${it.precio_promo?'promo':''}">₡${subStr}</div>
       </div>
       <div class="ci-bottom">
         <div class="ci-qty">
-          <button class="cib-btn minus" data-pid="${id}" onclick="cartQty(${id},-1)">−</button>
-          <div class="cib-num" data-pid="${id}">${qty}</div>
-          <button class="cib-btn plus" onclick="cartQty(${id},1)">+</button>
+          <button class="cib-btn minus" onclick="cartQtyByKey('${esc(Object.keys(carrito).find(k=>carrito[k]===it)||'')}', -1)">−</button>
+          <div class="cib-num">${it.qty}</div>
+          <button class="cib-btn plus"  onclick="cartQtyByKey('${esc(Object.keys(carrito).find(k=>carrito[k]===it)||'')}', 1)">+</button>
         </div>
-        <button class="ci-del" onclick="cartRemove(${id})">✕ Quitar</button>
+        <button class="ci-del" onclick="cartRemoveByKey('${esc(Object.keys(carrito).find(k=>carrito[k]===it)||'')}')">✕ Quitar</button>
       </div>
     </div>`;
   }).join('');
-  const desc=Object.entries(carrito).reduce((s,[id,q])=>{const p=todos.find(x=>x.id==id);return p&&p.precio_promo?s+(p.precio-p.precio_promo)*q:s;},0);
+  const desc = items.reduce((s,it)=>it.precio_promo?s+(it.precio-it.precio_promo)*it.qty:s, 0);
   let rows=`<div class="cs-row"><span>Productos (${totalQ})</span><span>₡${totalP.toLocaleString('es-CR',{maximumFractionDigits:0})}</span></div>`;
   if(desc>0) rows+=`<div class="cs-row" style="color:var(--promo)"><span>Ahorrás</span><span>−₡${desc.toLocaleString('es-CR',{maximumFractionDigits:0})}</span></div>`;
   rows+=`<div class="cs-row total"><span>Total</span><span>₡${totalP.toLocaleString('es-CR',{maximumFractionDigits:0})}</span></div>`;
-  summary.innerHTML=rows;
+  summary.innerHTML = rows;
 }
 
-function cartQty(id,delta){
-  carrito[id]=Math.max(0,(carrito[id]||0)+delta);
-  if(carrito[id]===0){cartRemove(id);return;}
-  syncCardBadge(id); renderCarrito();
+function cartQtyByKey(key, delta) {
+  if (!carrito[key]) return;
+  carrito[key].qty = Math.max(0, carrito[key].qty + delta);
+  if (carrito[key].qty === 0) { cartRemoveByKey(key); return; }
+  syncCardBadge(carrito[key].pid);
+  renderCarrito();
 }
-function cartRemove(id){delete carrito[id]; syncCardBadge(id); renderCarrito();}
-function clearCart(){Object.keys(carrito).forEach(id=>{delete carrito[id];syncCardBadge(id);}); carrito={}; renderCarrito();}
+function cartRemoveByKey(key) {
+  if (!carrito[key]) return;
+  const pid = carrito[key].pid;
+  delete carrito[key];
+  syncCardBadge(pid);
+  renderCarrito();
+}
+function cartQty(id,delta){ cartQtyByKey(String(id), delta); }
+function cartRemove(id){ cartRemoveByKey(String(id)); }
+function clearCart(){ Object.keys(carrito).forEach(k=>{ syncCardBadge(carrito[k].pid); delete carrito[k]; }); carrito={}; renderCarrito(); }
 function openCart(){document.getElementById('cartOverlay').classList.add('open');document.getElementById('cartDrawer').classList.add('open');}
 function closeCart(){document.getElementById('cartOverlay').classList.remove('open');document.getElementById('cartDrawer').classList.remove('open');}
 
 function enviarWhatsApp(){
-  const totalQ=Object.values(carrito).reduce((s,q)=>s+q,0);
+  const items=Object.values(carrito);
+  const totalQ=items.reduce((s,it)=>s+it.qty,0);
   if(!totalQ){showToast('⚠️ Agrega productos primero');return;}
   let msg='Hola! Quiero hacer este pedido:\n\n',total=0;
-  Object.entries(carrito).forEach(([id,qty])=>{
-    const p=todos.find(x=>x.id==id); if(!p) return;
-    const pf=pFinal(p);
-    msg+=`- ${qty}x ${p.nombre} (${p.marca}) ₡${(pf*qty).toLocaleString('es-CR',{maximumFractionDigits:0})}\n`;
-    total+=pf*qty;
+  items.forEach(it=>{
+    const pf=it.precio_promo||it.precio;
+    const variante=it.variante?` (${it.variante})`:'';
+    msg+=`- ${it.qty}x ${it.nombre}${variante} · ₡${(pf*it.qty).toLocaleString('es-CR',{maximumFractionDigits:0})}\n`;
+    total+=pf*it.qty;
   });
   msg+=`\n*Total: ₡${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*\n\nMuchas gracias! 🙏`;
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
