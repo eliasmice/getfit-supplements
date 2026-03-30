@@ -23,178 +23,139 @@
     .logo-text{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--white);line-height:1;text-transform:uppercase;}
     .logo-text span{color:var(--neon);}
     .logo-sub{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    
     .header-right{display:flex;align-items:center;gap:8px;flex:1;justify-content:flex-end;}
-    .search-bar{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;gap:8px;width:100%;max-width:250px;transition:border-color .2s;cursor:text;}
-    .search-bar:focus-within{border-color:var(--neon);}
-    .search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;width:100%;cursor:text;}
-    .search-bar input::placeholder{color:var(--muted);}
-    .cart-btn{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:6px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:500;transition:all .2s;white-space:nowrap;}
-    .cart-btn:hover{border-color:var(--neon);color:var(--neon);}
+    .search-bar{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;gap:8px;width:100%;max-width:250px;transition:border-color .2s;}
+    .search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;width:100%;}
+    
+    .cart-btn{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap;}
     .cart-badge{position:absolute;top:-6px;right:-6px;background:var(--neon);color:#000;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;}
 
     /* ── HERO ── */
-    .hero{position:relative;border-bottom:1px solid var(--border);padding:40px 20px;overflow:hidden;min-height:280px;display:flex;align-items:center;isolation:isolate;}
+    .hero{position:relative;border-bottom:1px solid var(--border);padding:60px 24px;overflow:hidden;min-height:300px;display:flex;align-items:center;isolation:isolate;}
     .hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.2;pointer-events:none;}
     .hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(8,12,10,.97) 40%,rgba(8,12,10,.55));pointer-events:none;}
     .hero-inner{position:relative;z-index:2;max-width:1400px;margin:0 auto;width:100%;}
-    .hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(32px,8vw,68px);line-height:.95;text-transform:uppercase;color:var(--white);}
+    .hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(38px,5.5vw,68px);line-height:.95;text-transform:uppercase;color:var(--white);}
     .hero h1 .accent{color:var(--neon);display:block;}
-    .hero p{margin-top:12px;color:var(--muted);font-size:14px;max-width:480px;line-height:1.5;}
-    .hero-badges{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;}
-    .hbadge{display:flex;align-items:center;gap:6px;background:rgba(14,21,16,.85);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--muted);}
-    .dot{width:6px;height:6px;background:var(--neon);border-radius:50%;flex-shrink:0;}
+    .hero p{margin-top:14px;color:var(--muted);font-size:15px;max-width:480px;line-height:1.6;}
+    .hero-badges{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;}
+    .hbadge{display:flex;align-items:center;gap:6px;background:rgba(14,21,16,.85);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--muted);}
+    .dot{width:6px;height:6px;background:var(--neon);border-radius:50%;}
 
     /* ══ VIEWS ══ */
     #viewCatalog{display:block;}
     #viewProduct{display:none;}
 
-    /* ── CATALOG LAYOUT ── */
-    .layout{max-width:1400px;margin:0 auto;padding:20px;display:grid;grid-template-columns:260px 1fr;gap:24px;}
+    /* ── LAYOUT ── */
+    .layout{max-width:1400px;margin:0 auto;padding:28px 24px;display:grid;grid-template-columns:260px 1fr;gap:28px;}
+    .sidebar{position:sticky;top:86px;height:fit-content;display:flex;flex-direction:column;gap:20px;}
 
-    /* ── SIDEBAR ── */
-    .sidebar{position:sticky;top:86px;height:fit-content;display:flex;flex-direction:column;gap:16px;}
+    /* Filter group */
     .fgroup{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-    .fgroup-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none;transition:background .15s;}
-    .fgroup-header:hover{background:var(--bg3);}
-    .fgroup-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
-    .fgroup-arrow{color:var(--muted);font-size:10px;transition:transform .2s;}
-    .fgroup.open .fgroup-arrow{transform:rotate(180deg);}
-    .fgroup-body{display:none;padding:10px 12px 12px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;}
+    .fgroup-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;}
+    .fgroup-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);}
+    .fgroup-body{display:none;padding:10px 12px 12px;border-top:1px solid var(--border);flex-wrap:wrap;gap:6px;}
     .fgroup.open .fgroup-body{display:flex;}
 
-    .pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;user-select:none;}
-    .pill:hover{border-color:var(--text);color:var(--text);}
-    .pill.active{background:rgba(57,255,20,.1);border-color:rgba(57,255,20,.35);color:var(--neon);}
-    .pill.promo-pill.active{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.4);color:var(--promo);}
-
+    /* Pills */
+    .pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;transition:0.2s;}
+    .pill.active{background:rgba(57,255,20,.1);border-color:var(--neon);color:var(--neon);}
     .sub-pill{font-size:11px;padding:4px 10px;}
-    .sub-pill::before{content:"↳ ";color:var(--neon-dim);}
-    .cat-parent{font-weight:600;width:100%;}
-    .subcat-group{display:none;flex-wrap:wrap;gap:5px;width:100%;padding-left:10px;border-left:2px solid rgba(57,255,20,0.25);margin-top:4px;margin-bottom:2px;}
+    .subcat-group{display:none;flex-wrap:wrap;gap:5px;width:100%;padding-left:10px;border-left:2px solid rgba(57,255,20,0.2);margin-top:4px;}
     .subcat-group.open{display:flex;}
 
-    /* MAIN */
-    .content-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
-    .content-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;text-transform:uppercase;color:var(--white);}
-    .content-count{color:var(--muted);font-size:12px;margin-top:2px;}
-    .sort-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;outline:none;}
-
-    .active-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-    .af-chip{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--neon);display:flex;align-items:center;gap:5px;}
-    .af-chip button{background:none;border:none;color:var(--neon);cursor:pointer;font-size:14px;line-height:1;padding:0;}
-    .clear-all-btn{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--promo);cursor:pointer;transition:all .15s;font-family:'Barlow',sans-serif;white-space:nowrap;}
-
     /* PRODUCT GRID */
-    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;}
+    .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;}
+    .product-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:0.25s;position:relative;display:flex;flex-direction:column;}
+    .product-card:hover{border-color:rgba(57,255,20,.3);transform:translateY(-3px);}
 
-    /* PRODUCT CARD */
-    .product-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .25s;position:relative;display:flex;flex-direction:column;}
-    .product-card:hover{border-color:rgba(57,255,20,.3);transform:translateY(-3px);box-shadow:0 8px 32px rgba(57,255,20,.07);}
-
-    /* GALLERY ADJUSTMENTS */
+    /* GALLERY - OPTIMIZED FOR MOBILE */
     .product-gallery{position:relative;width:100%;aspect-ratio:1;background:#fff;overflow:hidden;}
     .gallery-slides{display:flex;width:100%;height:100%;transition:transform .3s ease;}
     .gallery-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;}
     .gallery-slide img{width:90%;height:90%;object-fit:contain;}
     
-    .gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:5;opacity:0;}
+    .gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:5;opacity:0;}
     .product-card:hover .gallery-arrow{opacity:1;}
-    .gallery-arrow:hover{background:var(--neon);color:#000;}
-    .gallery-prev{left:8px;}.gallery-next{right:8px;}
+    .gallery-prev{left:6px;}.gallery-next{right:6px;}
 
-    .product-info{padding:12px;flex:1;}
-    .product-category{font-size:10px;color:var(--neon);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
-    .product-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--white);line-height:1.2;margin-bottom:6px;}
-    .product-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px;}
+    /* PRODUCT INFO */
+    .product-info{padding:12px; flex:1;}
+    .product-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--white);line-height:1.2;margin-bottom:5px;}
+    .product-price{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:19px;color:var(--neon);}
+    .price-promo{color:var(--promo);}
 
-    /* ══ PRODUCT PAGE VIEW ══ */
-    #viewProduct{max-width:1400px;margin:0 auto;padding:20px;position:relative;z-index:1;}
-    .product-page{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
-    .pp-main-img{width:100%;aspect-ratio:1;background:#fff;border-radius:16px;overflow:hidden;position:relative;margin-bottom:12px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
-    .pp-main-img img{width:90%;height:90%;object-fit:contain;cursor:zoom-in;}
-    .pp-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;}
-    .pp-thumbs::-webkit-scrollbar{display:none;}
-    .pp-thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;background:#fff;flex-shrink:0;}
+    /* PRODUCT PAGE */
+    .product-page{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+    .pp-main-img{width:100%;aspect-ratio:1;background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+    .pp-main-img img{width:90%;height:90%;object-fit:contain;}
+    .pp-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px; scrollbar-width: none;}
+    .pp-thumbs::-webkit-scrollbar { display: none; }
+    .pp-thumb{width:70px;height:70px;border-radius:8px;border:2px solid transparent;background:#fff;flex-shrink:0;cursor:pointer;}
     .pp-thumb.active{border-color:var(--neon);}
     .pp-thumb img{width:100%;height:100%;object-fit:contain;}
 
-    /* ── MOBILE OPTIMIZATIONS ── */
-    @media(max-width: 1000px){
-      .layout{grid-template-columns:1fr; padding:16px;}
-      .sidebar{position:static; order:-1;}
-      .product-page{grid-template-columns:1fr; gap:24px;}
-      .pp-gallery{position:static;}
-      .cart-drawer{width:100%;}
-      .search-bar{max-width:none; order: -1; margin-bottom: 0;}
-      .header-inner{height: auto; padding: 12px 16px; flex-wrap: wrap;}
-      .header-right{width: 100%; justify-content: space-between; gap:10px;}
-      .logo-text{font-size: 16px;}
-      
-      /* Habilitar swipe en tarjetas para móvil */
-      .gallery-slides {
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-      }
-      .gallery-slides::-webkit-scrollbar { display: none; }
-      .gallery-slide { scroll-snap-align: start; }
-      .gallery-arrow { display: none; } /* Ocultar flechas en móvil para favorecer el swipe */
-      
-      .product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-      .product-name { font-size: 15px; }
-      .pp-name { font-size: 28px; }
-    }
+    /* CONTROLS */
+    .card-qty, .pp-qty-ctrl{display:flex;align-items:center;}
+    .cq-btn, .ppq-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);width:30px;height:30px;cursor:pointer;font-weight:700;}
+    .cq-num, .ppq-num{width:35px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;}
 
-    /* Resto de estilos (cart, buttons, lightbox, etc) se mantienen igual... */
-    .back-btn{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 16px;font-family:'Barlow',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;margin-bottom:20px;text-decoration:none;}
-    .pp-info{display:flex;flex-direction:column;gap:16px;}
-    .pp-brand{font-size:11px;color:var(--neon);font-weight:600;letter-spacing:2px;text-transform:uppercase;}
-    .pp-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;color:var(--white);line-height:1.1;}
-    .pp-price-block{padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;}
-    .pp-price{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;color:var(--neon);}
-    .pp-price-orig{font-family:'Barlow Condensed',sans-serif;font-size:18px;color:var(--muted);text-decoration:line-through;}
-    .pp-price-promo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;color:var(--promo);}
-    .pp-qty-row{display:flex;align-items:center;gap:12px;margin-top:8px;}
-    .pp-qty-ctrl{display:flex;align-items:center;}
-    .ppq-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);width:40px;height:40px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
-    .ppq-num{background:var(--bg3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);color:var(--white);width:50px;height:40px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;}
-    .pp-add-btn{width:100%;background:var(--neon);color:#000;border:none;border-radius:10px;height:52px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;text-transform:uppercase;cursor:pointer;}
-
-    /* CART DRAWER */
+    /* CART */
+    .cart-drawer{position:fixed;right:0;top:0;width:400px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);z-index:151;transform:translateX(100%);transition:0.3s ease;display:flex;flex-direction:column;}
+    .cart-drawer.open{transform:translateX(0);}
     .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;display:none;backdrop-filter:blur(4px);}
     .cart-overlay.open{display:block;}
-    .cart-drawer{position:fixed;right:0;top:0;width:400px;height:100vh;background:var(--bg2);border-left:1px solid var(--border);z-index:151;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;}
-    .cart-drawer.open{transform:translateX(0);}
-    .cart-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-    .cart-items{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
-    .cart-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:12px;}
-    .wa-btn{width:100%;background:#25D366;color:#000;border:none;border-radius:10px;padding:16px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 
-    /* TOAST & LIGHTBOX */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--neon);color:#000;padding:12px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;z-index:600;transition:transform .3s ease;}
+    /* MOBILE ADJUSTMENTS */
+    @media(max-width:1000px){
+      .layout{grid-template-columns:1fr; padding:15px;}
+      .sidebar{position:static; order: -1;}
+      .product-page{grid-template-columns:1fr;}
+      .cart-drawer{width:100%;}
+      .header-inner{height: auto; padding: 12px 16px; flex-wrap: wrap;}
+      .header-right{width: 100%; justify-content: space-between; order: 2;}
+      .search-bar{max-width: none; flex: 1;}
+      
+      /* Habilitar swipe táctil en galerías de tarjetas */
+      .gallery-slides { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+      .gallery-slides::-webkit-scrollbar { display: none; }
+      .gallery-slide { scroll-snap-align: start; }
+      .gallery-arrow { display: none; } /* Ocultar flechas en móvil para no estorbar */
+      
+      .product-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; }
+      .hero{padding: 40px 20px;}
+    }
+
+    /* Common */
+    .brand-tag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;color:#bbb;z-index:3;}
+    .corner-tag{position:absolute;top:8px;right:8px;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:800;z-index:3;text-transform:uppercase;}
+    .tag-nuevo{background:var(--neon);color:#000;} .tag-promo{background:var(--promo);color:#fff;} .tag-agotado{background:#333;color:#777;}
+    .wa-btn{width:100%;background:#25D366;color:#000;border:none;border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--neon);color:#000;padding:12px 24px;border-radius:8px;font-weight:700;z-index:600;transition:0.3s;}
     .toast.show{transform:translateX(-50%) translateY(0);}
-    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;}
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:none;align-items:center;justify-content:center;}
     .lightbox.open{display:flex;}
-    .lightbox img{max-width:95vw;max-height:80vh;object-fit:contain;}
+    .lightbox img{max-width:90%; max-height:80%; object-fit:contain;}
   </style>
 </head>
 <body>
 
-<div class="topbar">🚀 Entregas en Puntarenas · 📦 Envíos a todo el país · 📲 WhatsApp</div>
+<div class="topbar">🚀 Entregas rápidas en Puntarenas · 📦 Envíos a todo el país</div>
 
 <header>
   <div class="header-inner">
     <div class="logo" onclick="goHome()">
-      <img class="logo-img" id="logoImg" src="https://drive.google.com/thumbnail?id=1uPfzn_J89fv5a81zDjs2klMpAQ0eH2sD&sz=w200" alt="GetFit" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'">
+      <img class="logo-img" id="logoImg" src="https://drive.google.com/thumbnail?id=1uPfzn_J89fv5a81zDjs2klMpAQ0eH2sD&sz=w200" alt="GetFit">
       <div class="logo-fallback" id="logoFb">🦍</div>
       <div>
-        <div class="logo-text">Get<span>Fit</span> Supplements</div>
-        <div class="logo-sub">Costa Rica</div>
+        <div class="logo-text">Get<span>Fit</span></div>
+        <div class="logo-sub">Supplements</div>
       </div>
     </div>
     <div class="header-right">
       <div class="search-bar">
-        <input type="search" id="searchInput" placeholder="Buscar..." autocomplete="off">
+        <input type="search" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
       </div>
       <button class="cart-btn" onclick="openCart()">
         🛒 <span class="cart-badge" id="cartBadge">0</span>
@@ -203,7 +164,6 @@
   </div>
 </header>
 
-<!-- Resto del cuerpo HTML igual al original... -->
 <div id="viewCatalog">
   <section class="hero">
     <div class="hero-bg" style="background-image:url('https://drive.google.com/thumbnail?id=1ctCaAk8QIsNjeVTdoHVHSX21bJJNO0-U&sz=w1600')"></div>
@@ -217,16 +177,13 @@
   <div class="layout">
     <aside class="sidebar" id="sidebar"></aside>
     <main>
-      <div class="content-header">
-        <div>
-          <div class="content-title" id="mainTitle">Productos</div>
-          <div class="content-count" id="mainCount">Cargando...</div>
-        </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 id="mainTitle" class="content-title">Catálogo</h2>
         <select class="sort-select" onchange="sortProducts(this.value)">
           <option value="default">Ordenar por</option>
           <option value="promo">Ofertas</option>
-          <option value="price-asc">Precio Bajo</option>
-          <option value="price-desc">Precio Alto</option>
+          <option value="price-asc">Precio: Bajo a Alto</option>
+          <option value="price-desc">Precio: Alto a Bajo</option>
         </select>
       </div>
       <div class="active-filters" id="activeFilters"></div>
@@ -236,19 +193,21 @@
 </div>
 
 <div id="viewProduct">
-  <button class="back-btn" onclick="goHome()">← Catálogo</button>
-  <div class="product-page" id="productPage"></div>
+  <div style="padding: 20px; max-width: 1400px; margin: 0 auto;">
+    <button class="pill" onclick="goHome()">← Volver al catálogo</button>
+    <div class="product-page" id="productPage" style="margin-top:20px;"></div>
+  </div>
 </div>
 
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
 <div class="cart-drawer" id="cartDrawer">
-  <div class="cart-header">
-    <div class="cart-title">Tu Carrito</div>
-    <button onclick="closeCart()">✕</button>
+  <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+    <h3 style="font-family:'Barlow Condensed'">Tu Pedido</h3>
+    <button onclick="closeCart()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">✕</button>
   </div>
   <div class="cart-items" id="cartItems"></div>
-  <div class="cart-footer" style="padding:20px; border-top:1px solid var(--border)">
-    <div id="cartSummary"></div>
+  <div style="padding:20px; border-top:1px solid var(--border);">
+    <div id="cartSummary" style="margin-bottom:15px;"></div>
     <button class="wa-btn" onclick="enviarWhatsApp()">📲 Pedir por WhatsApp</button>
   </div>
 </div>
@@ -259,12 +218,265 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- El SCRIPT se mantiene prácticamente igual para no romper la lógica de datos -->
 <script>
-// (Aquí va todo tu bloque de script original, los ajustes fueron mayormente visuales en el CSS)
-// No olvides incluir las funciones que ya tenías para cargar productos, filtros y carrito.
-// Los ajustes visuales de las tarjetas ya están cubiertos por las clases de CSS arriba.
-// [Copia aquí el resto de tu <script> original]
+const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
+const WHATSAPP  = '50689754195';
+
+let todos = [], filtrados = [], carrito = {}, activeCats = new Set(), activeBrands = new Set();
+let filterPromo = false, filterNuevo = false, searchTerm = '', sortOrder = 'default', gPos = {};
+
+async function cargarProductos() {
+  try {
+    const res = await fetch(SHEET_URL);
+    const data = await res.json();
+    todos = data.map((row, i) => ({
+      id: i,
+      nombre: (row.nombre || '').trim(),
+      marca: (row.marca || '').trim(),
+      precio: parseInt(row.precio) || 0,
+      precio_promo: parseInt(row.precio_promo) || 0,
+      categoria: (row.categoria || 'Suplementos').trim(),
+      subcategoria: (row.subcategoria || '').trim(),
+      info: (row.info || '').trim(),
+      imgs: [row.imagen1, row.imagen2, row.imagen3, row.imagen4].filter(Boolean),
+      sabores: (row.sabores || '').trim(),
+      tamanios: (row.tamanios || '').trim(),
+      disponible: (row.disponible || 'si').toLowerCase() !== 'no',
+      nuevo: (row.nuevo || 'no').toLowerCase() === 'si',
+    })).filter(p => p.nombre);
+    construirSidebar();
+    aplicarFiltros();
+    handleURL();
+  } catch(e) { console.error(e); }
+}
+
+function construirSidebar() {
+  const marcas = [...new Set(todos.map(p=>p.marca))].sort();
+  const catTree = {};
+  todos.forEach(p => {
+    if (!catTree[p.categoria]) catTree[p.categoria] = new Set();
+    if (p.subcategoria) catTree[p.categoria].add(p.subcategoria);
+  });
+
+  let html = `<div class="fgroup open"><div class="fgroup-header" onclick="this.parentElement.classList.toggle('open')"><span class="fgroup-title">Filtros</span></div><div class="fgroup-body">
+    <span class="pill" onclick="togglePromo(this)">🔥 Ofertas</span>
+    <span class="pill" onclick="toggleNuevo(this)">✨ Nuevos</span>
+  </div></div>`;
+
+  html += `<div class="fgroup open"><div class="fgroup-header" onclick="this.parentElement.classList.toggle('open')"><span class="fgroup-title">Categorías</span></div><div class="fgroup-body">`;
+  Object.keys(catTree).sort().forEach(cat => {
+    html += `<span class="pill cat-parent" onclick="toggleCat('${cat}', this)">${cat}</span>`;
+    if (catTree[cat].size > 0) {
+      html += `<div class="subcat-group" id="sg-${cat.replace(/\s/g,'')}">`;
+      catTree[cat].forEach(sub => {
+        html += `<span class="pill sub-pill" onclick="toggleSubcat('${cat}','${sub}',this)">${sub}</span>`;
+      });
+      html += `</div>`;
+    }
+  });
+  html += `</div></div>`;
+  document.getElementById('sidebar').innerHTML = html;
+}
+
+function toggleCat(cat, pill) {
+  activeCats.has(cat) ? activeCats.delete(cat) : activeCats.add(cat);
+  pill.classList.toggle('active');
+  const sg = document.getElementById('sg-'+cat.replace(/\s/g,''));
+  if(sg) sg.classList.toggle('open', activeCats.has(cat));
+  aplicarFiltros();
+}
+
+function toggleSubcat(cat, sub, pill) {
+  pill.classList.toggle('active');
+  // Lógica de subcategoría simplificada
+  aplicarFiltros();
+}
+
+function aplicarFiltros() {
+  filtrados = todos.filter(p => {
+    const matchCat = activeCats.size === 0 || activeCats.has(p.categoria);
+    const matchPromo = !filterPromo || p.precio_promo > 0;
+    const matchNuevo = !filterNuevo || p.nuevo;
+    const matchSearch = p.nombre.toLowerCase().includes(searchTerm) || p.marca.toLowerCase().includes(searchTerm);
+    return matchCat && matchPromo && matchNuevo && matchSearch;
+  });
+
+  if(sortOrder === 'price-asc') filtrados.sort((a,b) => (a.precio_promo||a.precio) - (b.precio_promo||b.precio));
+  if(sortOrder === 'price-desc') filtrados.sort((a,b) => (b.precio_promo||b.precio) - (a.precio_promo||a.precio));
+  
+  renderProductos();
+}
+
+function renderProductos() {
+  const grid = document.getElementById('productGrid');
+  document.getElementById('mainCount').textContent = `${filtrados.length} productos`;
+  
+  grid.innerHTML = filtrados.map((p, fi) => {
+    const precio = p.precio_promo > 0 
+      ? `<span class="price-promo">₡${p.precio_promo.toLocaleString()}</span> <small style="text-decoration:line-through; color:var(--muted)">₡${p.precio.toLocaleString()}</small>`
+      : `<span>₡${p.precio.toLocaleString()}</span>`;
+    
+    return `
+    <div class="product-card">
+      <div class="product-gallery" onclick="showProductPage(${p.id})">
+        <div class="gallery-slides" id="slides-${fi}">
+          ${p.imgs.map(img => `<div class="gallery-slide"><img src="${img}" loading="lazy"></div>`).join('')}
+        </div>
+        <div class="brand-tag">${p.marca}</div>
+        ${p.nuevo ? '<div class="corner-tag tag-nuevo">Nuevo</div>' : ''}
+        ${p.precio_promo > 0 ? '<div class="corner-tag tag-promo">Oferta</div>' : ''}
+      </div>
+      <div class="product-info">
+        <div class="product-name" onclick="showProductPage(${p.id})">${p.nombre}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <div class="product-price">${precio}</div>
+          <button class="cq-btn" onclick="agregarAlCarritoDirecto(${p.id})" style="background:var(--neon); color:black; border-radius:5px; width:auto; padding:0 10px;">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showProductPage(id) {
+  const p = todos.find(x => x.id === id);
+  if(!p) return;
+  window.location.hash = `producto-${id}`;
+  document.getElementById('viewCatalog').style.display = 'none';
+  document.getElementById('viewProduct').style.display = 'block';
+  
+  const priceHTML = p.precio_promo > 0 
+    ? `<div class="pp-price-promo">₡${p.precio_promo.toLocaleString()}</div><div class="pp-price-orig">Antes: ₡${p.precio.toLocaleString()}</div>`
+    : `<div class="pp-price">₡${p.precio.toLocaleString()}</div>`;
+
+  document.getElementById('productPage').innerHTML = `
+    <div class="pp-gallery">
+      <div class="pp-main-img"><img src="${p.imgs[0]}" id="mainImg" onclick="openLightbox('${p.imgs[0]}')"></div>
+      <div class="pp-thumbs">${p.imgs.map((img, i) => `<div class="pp-thumb ${i===0?'active':''}" onclick="changePPImg('${img}', this)"><img src="${img}"></div>`).join('')}</div>
+    </div>
+    <div class="pp-info">
+      <div class="pp-brand">${p.marca}</div>
+      <h1 class="pp-name">${p.nombre}</h1>
+      <div class="pp-price-block">${priceHTML}</div>
+      <p style="color:var(--muted); line-height:1.6;">${p.info}</p>
+      <div class="pp-qty-row">
+        <div class="pp-qty-ctrl">
+          <button class="ppq-btn" onclick="updatePPQty(-1)">-</button>
+          <div class="ppq-num" id="ppQty">1</div>
+          <button class="ppq-btn" onclick="updatePPQty(1)">+</button>
+        </div>
+        <button class="pp-add-btn" onclick="agregarAlCarrito(${p.id})">Agregar al Carrito</button>
+      </div>
+    </div>`;
+}
+
+function changePPImg(src, el) {
+  document.getElementById('mainImg').src = src;
+  document.querySelectorAll('.pp-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updatePPQty(val) {
+  const el = document.getElementById('ppQty');
+  let current = parseInt(el.textContent);
+  el.textContent = Math.max(1, current + val);
+}
+
+function agregarAlCarritoDirecto(id) {
+  const p = todos.find(x => x.id === id);
+  if(!carrito[id]) carrito[id] = { ...p, qty: 0 };
+  carrito[id].qty++;
+  renderCarrito();
+  showToast("Agregado al carrito");
+}
+
+function agregarAlCarrito(id) {
+  const p = todos.find(x => x.id === id);
+  const qty = parseInt(document.getElementById('ppQty').textContent);
+  if(!carrito[id]) carrito[id] = { ...p, qty: 0 };
+  carrito[id].qty += qty;
+  renderCarrito();
+  showToast(`Agregado: ${qty} unidad(es)`);
+}
+
+function renderCarrito() {
+  const container = document.getElementById('cartItems');
+  const items = Object.values(carrito);
+  let total = 0, totalQty = 0;
+  
+  container.innerHTML = items.map(it => {
+    const pf = it.precio_promo || it.precio;
+    total += pf * it.qty;
+    totalQty += it.qty;
+    return `<div class="cart-item">
+      <div style="display:flex; gap:10px;">
+        <img src="${it.imgs[0]}" style="width:50px; height:50px; object-fit:contain; background:white; border-radius:5px;">
+        <div>
+          <div style="font-size:14px; font-weight:700;">${it.nombre}</div>
+          <div style="color:var(--neon); font-size:13px;">₡${pf.toLocaleString()} x ${it.qty}</div>
+        </div>
+      </div>
+      <button onclick="eliminarDelCarrito(${it.id})" style="background:none; border:none; color:var(--promo); cursor:pointer;">Quitar</button>
+    </div>`;
+  }).join('');
+  
+  document.getElementById('cartBadge').textContent = totalQty;
+  document.getElementById('cartBadge').style.display = totalQty > 0 ? 'flex' : 'none';
+  document.getElementById('cartSummary').innerHTML = `<div style="display:flex; justify-content:space-between; font-weight:700;"><span>Total:</span><span>₡${total.toLocaleString()}</span></div>`;
+}
+
+function eliminarDelCarrito(id) {
+  delete carrito[id];
+  renderCarrito();
+}
+
+function enviarWhatsApp() {
+  const items = Object.values(carrito);
+  if(items.length === 0) return;
+  let msg = "¡Hola GetFit! Quisiera pedir:\n\n";
+  let total = 0;
+  items.forEach(it => {
+    const pf = it.precio_promo || it.precio;
+    msg += `- ${it.qty}x ${it.nombre} (₡${(pf * it.qty).toLocaleString()})\n`;
+    total += pf * it.qty;
+  });
+  msg += `\n*Total: ₡${total.toLocaleString()}*`;
+  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
+}
+
+function togglePromo(el) { filterPromo = !filterPromo; el.classList.toggle('active'); aplicarFiltros(); }
+function toggleNuevo(el) { filterNuevo = !filterNuevo; el.classList.toggle('active'); aplicarFiltros(); }
+function sortProducts(val) { sortOrder = val; aplicarFiltros(); }
+
+function goHome() {
+  window.location.hash = '';
+  document.getElementById('viewCatalog').style.display = 'block';
+  document.getElementById('viewProduct').style.display = 'none';
+}
+
+function handleURL() {
+  const hash = window.location.hash;
+  if(hash.startsWith('#producto-')) {
+    const id = parseInt(hash.split('-')[1]);
+    showProductPage(id);
+  } else { goHome(); }
+}
+
+function openLightbox(src) {
+  document.getElementById('lbImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
+function openCart() { document.getElementById('cartOverlay').classList.add('open'); document.getElementById('cartDrawer').classList.add('open'); }
+function closeCart() { document.getElementById('cartOverlay').classList.remove('open'); document.getElementById('cartDrawer').classList.remove('open'); }
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchTerm = e.target.value.toLowerCase();
+  aplicarFiltros();
+});
+
+window.addEventListener('popstate', handleURL);
+cargarProductos();
 </script>
 </body>
 </html>
