@@ -104,7 +104,7 @@
     /* PRODUCT CARD */
     .product-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .25s;position:relative;}
     .product-card:hover{border-color:rgba(57,255,20,.3);transform:translateY(-3px);box-shadow:0 8px 32px rgba(57,255,20,.07);}
-    .card-click-area{cursor:pointer;}
+    /* card-click-area deprecated — onclick en galería e info directamente */
 
     /* GALLERY */
     .product-gallery{position:relative;width:100%;aspect-ratio:1;background:#f0f0f0;overflow:hidden;}
@@ -941,30 +941,28 @@ function renderProductos() {
       : `<div class="product-price"><span class="cur">₡</span>${pStr}</div>`;
     const qty = carrito[p.id]||0;
     const controls = p.disponible
-      ? `<div class="card-qty" onclick="event.stopPropagation()">
-           <button class="cq-btn minus" data-pid="${p.id}" onclick="cambiarQty(${p.id},-1)" ${qty===0?'disabled':''}>−</button>
+      ? `<div class="card-qty" onclick="event.stopPropagation()" style="position:relative;z-index:10">
+           <button class="cq-btn minus" data-pid="${p.id}" onclick="event.stopPropagation();cambiarQty(${p.id},-1)" ${qty===0?'disabled':''}>−</button>
            <div class="cq-num" data-pid="${p.id}">${qty}</div>
-           <button class="cq-btn plus" data-pid="${p.id}" onclick="cambiarQty(${p.id},1)">+</button>
+           <button class="cq-btn plus" data-pid="${p.id}" onclick="event.stopPropagation();cambiarQty(${p.id},1)">+</button>
          </div>`
       : `<div style="font-size:11px;color:#555">Sin stock</div>`;
 
     return `
     <div class="product-card" id="card-${p.id}">
-      <div class="card-click-area" onclick="showProductPage(todos.find(x=>x.id===${p.id}))">
-        <div class="product-gallery">
-          <div class="gallery-slides" id="gslides-${fi}">${slides}</div>
-          ${arrows}${dots}
-          <div class="brand-tag">${esc(p.marca)}</div>
-          ${ctag}
-          <div class="card-qty-badge" id="qbadge-${p.id}" style="display:${qty>0?'block':'none'}">${qty} en carrito</div>
-        </div>
-        <div class="product-info">
-          <div class="product-category">${esc(p.subcategoria || p.categoria)}</div>
-          <div class="product-name">${esc(p.nombre)}</div>
-          <div class="product-desc">${esc(p.descripcion)}</div>
-        </div>
+      <div class="product-gallery" onclick="showProductPage(todos.find(x=>x.id===${p.id}))" style="cursor:pointer">
+        <div class="gallery-slides" id="gslides-${fi}">${slides}</div>
+        ${arrows}${dots}
+        <div class="brand-tag">${esc(p.marca)}</div>
+        ${ctag}
+        <div class="card-qty-badge" id="qbadge-${p.id}" style="display:${qty>0?'block':'none'}">${qty} en carrito</div>
       </div>
-      <div style="padding:0 12px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div class="product-info" onclick="showProductPage(todos.find(x=>x.id===${p.id}))" style="cursor:pointer">
+        <div class="product-category">${esc(p.subcategoria || p.categoria)}</div>
+        <div class="product-name">${esc(p.nombre)}</div>
+        <div class="product-desc">${esc(p.descripcion)}</div>
+      </div>
+      <div style="padding:0 12px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;" onclick="event.stopPropagation()">
         <div>${precioHTML}</div>
         ${controls}
       </div>
