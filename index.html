@@ -589,6 +589,14 @@
 <script>
 // ═══════════════════════════════════════
 const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
+
+// Proxy para imágenes bloqueadas por hotlink protection
+function proxyImg(url) {
+  if (!url) return '';
+  // Si ya es un proxy o no es de asncostarica, retornar tal cual
+  if (!url.includes('asncostarica.com') && !url.includes('wp.com')) return url;
+  return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&w=400&output=webp';
+}
 const WHATSAPP  = '50689222123';
 
 // ═══════════════════════════════════════
@@ -936,7 +944,7 @@ function renderProductos() {
     const prStr= tp ? p.precio_promo.toLocaleString('es-CR',{maximumFractionDigits:0}) : '';
     const multi= p.imgs.length > 1;
     const slides = p.imgs.length
-      ? p.imgs.map(u=>`<div class="gallery-slide"><img src="${esc(u)}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=\\'fallback\\'>💪</span>'"></div>`).join('')
+      ? p.imgs.map(u=>`<div class="gallery-slide"><img src="${proxyImg(u)}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.style.display='none'"></div>`).join('')
       : `<div class="gallery-slide"><span class="fallback">💪</span></div>`;
     const arrows = multi
       ? `<button class="gallery-arrow gallery-prev" onclick="event.stopPropagation();cardSlide(${fi},-1)">‹</button>
@@ -999,7 +1007,7 @@ function cambiarQty(pid, delta) {
   const cartKey = String(pid);
   // if product has variants, open product page instead of direct add
   if (delta > 0 && (p.sabores || p.tamanios)) {
-    showProductPage(p); showToast('Elegí sabor y tamaño 👆'); return;
+    showProductPage(p); return;
   }
   if (!carrito[cartKey]) carrito[cartKey] = { pid, qty:0, nombre:p.nombre, marca:p.marca, precio:p.precio, precio_promo:p.precio_promo, imgs:p.imgs, variante:'' };
   carrito[cartKey].qty = Math.max(0, carrito[cartKey].qty + delta);
@@ -1028,12 +1036,12 @@ function renderProductPage(p) {
   // Gallery
   const thumbs = p.imgs.map((u,i)=>`
     <div class="pp-thumb ${i===0?'active':''}" id="thumb-${i}" onclick="ppSelectImg(${i},'${esc(u)}')">
-      <img src="${esc(u)}" alt="${esc(p.nombre)}" loading="lazy">
+      <img src="${proxyImg(u)}" alt="${esc(p.nombre)}" loading="lazy">
     </div>`).join('');
   // Store imgs globally for lightbox
-  window._ppImgs = p.imgs.slice();
+  window._ppImgs = p.imgs.map(proxyImg);
   const mainImg = p.imgs.length
-    ? `<img id="ppMainImg" src="${esc(p.imgs[0])}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)">`
+    ? `<img id="ppMainImg" src="${proxyImg(p.imgs[0])}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)">`
     : `<div class="fallback" style="font-size:80px;display:flex;align-items:center;justify-content:center;height:100%">💪</div>`;
 
   // Tags
@@ -1134,8 +1142,21 @@ function ppAgregar(pid) {
   const sabor     = saborEl   ? saborEl.value   : '';
   const tamanio   = tamanioEl ? tamanioEl.value  : '';
   // Validate required selections
-  if (saborEl   && !sabor)   { showToast('⚠️ Seleccioná un sabor primero');   return; }
-  if (tamanioEl && !tamanio) { showToast('⚠️ Seleccioná un tamaño primero');  return; }
+  // Validar solo los que existen — mostrar error inline en el select
+  if (saborEl && !sabor) {
+    saborEl.style.borderColor = 'var(--promo)';
+    saborEl.style.boxShadow = '0 0 0 2px rgba(255,107,53,0.3)';
+    setTimeout(() => { saborEl.style.borderColor=''; saborEl.style.boxShadow=''; }, 2500);
+    saborEl.focus();
+    return;
+  }
+  if (tamanioEl && !tamanio) {
+    tamanioEl.style.borderColor = 'var(--promo)';
+    tamanioEl.style.boxShadow = '0 0 0 2px rgba(255,107,53,0.3)';
+    setTimeout(() => { tamanioEl.style.borderColor=''; tamanioEl.style.boxShadow=''; }, 2500);
+    tamanioEl.focus();
+    return;
+  }
   // Build variant key so same product with diff variants = separate cart entries
   const varKey  = [sabor, tamanio].filter(Boolean).join(' · ');
   const cartKey = pid + (varKey ? '_'+varKey : '');
@@ -1222,7 +1243,7 @@ function renderCarrito() {
     const key   = JSON.stringify(Object.keys(carrito).find(k=>carrito[k]===it));
     return `<div class="cart-item">
       <div class="ci-top">
-        ${thumb?`<img class="ci-img" src="${esc(thumb)}" alt="${esc(it.nombre)}" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
+        ${thumb?`<img class="ci-img" src="${proxyImg(thumb)}" alt="${esc(it.nombre)}" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
         <div class="ci-info">
           <div class="ci-name">${esc(it.nombre)}</div>
           <div class="ci-brand">${esc(it.marca)}${it.variante?` · <span style="color:var(--neon)">${esc(it.variante)}</span>`:''}</div>
@@ -1287,7 +1308,17 @@ function enviarWhatsApp(){
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(msg, duration=2500){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'), duration);
+}
+document.getElementById && document.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('toast');
+  if(t) t.addEventListener('click',()=>t.classList.remove('show'));
+});
 
 // Search input listener — attached in JS to avoid any HTML attribute issues
 // ── MOBILE SEARCH EXPAND ──
