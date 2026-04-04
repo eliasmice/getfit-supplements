@@ -280,116 +280,125 @@
     /* ── MOBILE ── */
     @media(max-width:620px){
 
-      /* Topbar */
-      .topbar{font-size:10px;padding:6px 8px;letter-spacing:1px;}
+      /* ── TOPBAR ── */
+      .topbar{font-size:10px;padding:5px 8px;letter-spacing:0;}
 
-      /* Header */
-      .header-inner{padding:0 12px;height:58px;gap:8px;}
+      /* ── HEADER ── */
+      .header-inner{padding:0 12px;height:56px;gap:8px;}
       .logo-text{font-size:16px;}
       .logo-sub{display:none;}
-      .logo-img{height:34px;}
-      .logo-fallback{width:34px;height:34px;font-size:16px;}
+      .logo-img{height:32px;}
+      .logo-fallback{width:32px;height:32px;font-size:15px;}
 
-      /* Search: icon-only, expands on click */
+      /* Search — círculo que expande */
       .search-bar{
-        width:38px;height:38px;padding:0;
-        border-radius:50%;justify-content:center;
-        overflow:hidden;transition:width .25s ease,border-radius .25s ease,padding .25s ease;
-        flex-shrink:0;
+        width:36px;height:36px;padding:0;border-radius:50%;
+        justify-content:center;overflow:hidden;
+        transition:width .25s,border-radius .25s,padding .25s;
+        flex-shrink:0;border:1px solid var(--border);
       }
       .search-bar.expanded{
-        width:160px;border-radius:8px;padding:8px 12px;justify-content:flex-start;
+        width:150px;border-radius:8px;padding:7px 11px;justify-content:flex-start;
       }
-      .search-bar svg{flex-shrink:0;}
-      .search-bar input{
-        width:0;opacity:0;transition:width .2s,opacity .2s;padding:0;
-      }
-      .search-bar.expanded input{width:100%;opacity:1;}
-      .search-bar svg{margin:auto;}
+      .search-bar svg{flex-shrink:0;margin:auto;}
       .search-bar.expanded svg{margin:0;}
+      .search-bar input{width:0;opacity:0;transition:width .2s,opacity .15s;padding:0;}
+      .search-bar.expanded input{width:100%;opacity:1;}
 
-      /* Cart button */
-      .cart-btn{padding:8px 12px;font-size:13px;gap:6px;}
+      /* Cart button — solo ícono en mobile */
+      .cart-btn{padding:8px 10px;font-size:0;gap:0;min-width:36px;height:36px;justify-content:center;}
+      .cart-btn::before{content:'🛒';font-size:18px;}
+      .cart-btn .cart-badge{top:-5px;right:-5px;}
 
-      /* Sidebar hidden — usar botón flotante */
+      /* ── SIDEBAR → FAB ── */
       .sidebar{display:none;}
       .filter-fab{display:flex !important;}
       .sidebar-drawer{display:flex !important;}
 
-      /* Hero */
-      .hero{padding:32px 14px;min-height:200px;}
-      .hero h1{font-size:30px;}
-      .hero p{font-size:13px;margin-top:10px;}
-      .hero-badges{gap:6px;margin-top:14px;}
-      .hbadge{font-size:10px;padding:4px 9px;}
+      /* ── HERO ── */
+      .hero{padding:28px 14px;min-height:180px;}
+      .hero h1{font-size:28px;}
+      .hero p{font-size:13px;margin-top:8px;max-width:100%;}
+      .hero-badges{gap:5px;margin-top:12px;}
+      .hbadge{font-size:10px;padding:3px 8px;}
 
-      /* Layout */
-      .layout{padding:14px 10px;gap:14px;}
-      .content-header{margin-bottom:12px;gap:8px;}
+      /* ── LAYOUT ── */
+      .layout{padding:12px 10px 80px;gap:12px;} /* padding-bottom para FAB */
+      .content-header{margin-bottom:10px;flex-direction:column;align-items:flex-start;gap:6px;}
       .content-title{font-size:18px;}
-      .content-count{font-size:12px;}
-      .sort-select{font-size:12px;padding:6px 8px;}
+      .content-count{font-size:12px;margin-top:0;}
+      .sort-select{font-size:12px;padding:6px 10px;width:100%;}
 
-      /* Grid 2 columnas */
+      /* ── GRID 2 COLUMNAS ── */
       .product-grid{grid-template-columns:1fr 1fr;gap:8px;}
       .product-card{border-radius:10px;}
       .product-gallery{aspect-ratio:1;}
-      .product-info{padding:8px;}
-      .product-category{font-size:9px;letter-spacing:1px;}
-      .product-name{font-size:13px;margin-bottom:4px;}
+      .product-info{padding:7px 8px 4px;}
+      .product-category{font-size:9px;letter-spacing:0;margin-bottom:2px;}
+      .product-name{font-size:12px;margin-bottom:3px;line-height:1.2;}
       .product-desc{display:none;}
-      .product-price{font-size:15px;}
-      .price-promo{font-size:15px;}
-      .price-original{font-size:11px;}
+      .product-price{font-size:14px;}
+      .price-promo{font-size:14px;}
+      .price-original{font-size:10px;}
+      /* Footer de la card */
+      .product-card > div:last-child{padding:0 8px 8px;gap:4px;flex-wrap:wrap;}
       .card-qty{gap:0;}
-      .cq-btn{width:24px;height:26px;font-size:13px;}
-      .cq-num{width:22px;height:26px;font-size:13px;}
-      .brand-tag{font-size:9px;padding:2px 5px;}
-      .corner-tag{font-size:9px;padding:2px 5px;}
+      .cq-btn{width:26px;height:26px;font-size:14px;}
+      .cq-num{width:24px;height:26px;font-size:13px;}
+      .brand-tag{font-size:8px;padding:2px 4px;top:5px;left:5px;}
+      .corner-tag{font-size:8px;padding:2px 4px;top:5px;right:5px;}
+      .card-qty-badge{font-size:9px;padding:1px 5px;}
 
-      /* Active filters */
-      .active-filters{gap:4px;}
-      .af-chip{font-size:11px;padding:3px 7px;}
-      .clear-all-btn{font-size:11px;padding:4px 10px;}
+      /* ── ACTIVE FILTERS ── */
+      .active-filters{gap:4px;flex-wrap:wrap;}
+      .af-chip{font-size:10px;padding:2px 7px;}
+      .clear-all-btn{font-size:10px;padding:3px 9px;}
 
-      /* Product page */
-      #viewProduct{padding:12px 10px;}
-      .back-btn{padding:6px 12px;font-size:12px;margin-bottom:14px;}
-      .product-page{gap:16px;}
+      /* ── PRODUCT PAGE ── */
+      #viewProduct{padding:10px 10px 30px;}
+      .back-btn{padding:6px 12px;font-size:12px;margin-bottom:12px;}
+      .product-page{gap:14px;}
       .pp-main-img{border-radius:10px;}
       .pp-thumbs{gap:6px;}
-      .pp-thumb{width:52px;height:52px;border-radius:6px;}
+      .pp-thumb{width:54px;height:54px;border-radius:6px;}
       .pp-thumb img{object-fit:contain;background:#f5f5f5;}
-      .pp-name{font-size:24px;}
-      .pp-price{font-size:26px;}
-      .pp-price-promo{font-size:26px;}
-      .pp-price-orig{font-size:16px;}
+      .pp-name{font-size:22px;}
+      .pp-price{font-size:24px;}
+      .pp-price-promo{font-size:24px;}
+      .pp-price-orig{font-size:15px;}
+      .pp-saving{font-size:11px;}
       .pp-price-block{padding:12px;}
-      .pp-add-btn{font-size:14px;height:44px;}
-      .pp-info-box{font-size:12px;line-height:1.7;padding:12px;}
-      .share-btn{font-size:12px;}
+      .pp-qty-row{flex-wrap:wrap;gap:8px;}
+      .pp-add-btn{font-size:14px;height:46px;border-radius:10px;}
+      .pp-info-box{font-size:12px;line-height:1.7;padding:11px;}
+      .pp-desc{font-size:13px;padding:11px;}
+      .share-btn{font-size:12px;padding:7px 12px;}
       .variant-select{font-size:13px;padding:9px 12px;}
+      .pp-section-title{font-size:11px;}
 
-      /* Cart */
+      /* ── CARRITO (sube desde abajo) ── */
       .cart-overlay{z-index:219;}
       .cart-drawer{
         width:100%;border-radius:16px 16px 0 0;
-        top:auto;bottom:0;height:88vh;
-        transform:translateY(100%);
-        z-index:220;
+        top:auto;bottom:0;height:90vh;
+        transform:translateY(100%);z-index:220;
       }
       .cart-drawer.open{transform:translateY(0);}
       .cart-header{padding:14px 16px;}
       .cart-title{font-size:18px;}
-      .cart-items{padding:10px;}
+      .cart-items{padding:10px 12px;}
       .cart-footer{padding:12px 16px;}
+      .wa-btn{font-size:15px;padding:13px;}
+      .cs-row:last-child{font-size:18px;}
 
-      /* Toast sube para no tapar FAB */
-      .toast{bottom:76px;font-size:13px;padding:10px 18px;}
+      /* ── TOAST — encima de FAB ── */
+      .toast{bottom:80px;font-size:13px;padding:9px 16px;border-radius:20px;}
 
-      /* Footer */
-      footer{padding:28px 14px;margin-top:40px;}
-      .footer-links{gap:14px;}
+      /* ── FOOTER ── */
+      footer{padding:24px 14px;margin-top:0;}
+      .footer-logo-img{height:40px;}
+      .footer-links{gap:12px;}
+      footer p{font-size:12px;}
     }
 
     /* ── FILTER FAB (solo mobile) ── */
@@ -527,7 +536,7 @@
     <p>📱 Pedidos y consultas por WhatsApp &nbsp;·&nbsp; 🚚 Envíos a todo el país</p>
     <div class="footer-links">
       <a href="https://www.instagram.com/getfitsupplements_/" target="_blank">📸 Instagram</a>
-      <a href="https://wa.me/50689222123" target="_blank">💬 WhatsApp</a>
+      <a href="https://wa.me/50689754195" target="_blank">💬 WhatsApp</a>
     </div>
   </div>
 </footer>
@@ -578,7 +587,7 @@
 <script>
 // ═══════════════════════════════════════
 const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
-const WHATSAPP  = '89222123';
+const WHATSAPP  = '50689754195';
 
 // ═══════════════════════════════════════
 
@@ -1272,7 +1281,7 @@ function enviarWhatsApp(){
     total+=pf*it.qty;
   });
   msg+=`\n*Total: ₡${total.toLocaleString('es-CR',{maximumFractionDigits:0})}*\n\nMuchas gracias!`;
-  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`);
+  window.location.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
