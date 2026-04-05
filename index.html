@@ -263,8 +263,8 @@
     .footer-links a:hover{color:var(--neon);}
 
     /* TOAST */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--neon);color:#000;padding:12px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;z-index:600;transition:transform .3s ease;white-space:nowrap;}
-    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--neon);color:#000;padding:12px 24px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;z-index:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .25s ease, bottom .25s ease;}
+    .toast.show{opacity:1;pointer-events:auto;bottom:28px;}
 
 
     /* ── TABLET ── */
@@ -315,7 +315,7 @@
       .filter-fab{display:flex !important;}
       .sidebar-drawer{display:flex !important;}
       /* Toast no necesita subir — FAB ya no es fixed */
-      .toast{bottom:24px;}
+      .toast{bottom:20px;font-size:13px;padding:10px 16px;border-radius:20px;}
 
       /* ── HERO ── */
       .hero{padding:28px 14px;min-height:180px;}
@@ -394,7 +394,7 @@
       .cs-row:last-child{font-size:18px;}
 
       /* ── TOAST — encima de FAB ── */
-      .toast{bottom:80px;font-size:13px;padding:9px 16px;border-radius:20px;}
+      .toast.show{bottom:24px;}
 
       /* ── FOOTER ── */
       footer{padding:24px 14px;margin-top:0;}
@@ -590,12 +590,27 @@
 // ═══════════════════════════════════════
 const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
 
-// Proxy para imágenes bloqueadas por hotlink protection
+// Proxy para imágenes — maneja hotlink protection
 function proxyImg(url) {
   if (!url) return '';
-  // Si ya es un proxy o no es de asncostarica, retornar tal cual
-  if (!url.includes('asncostarica.com') && !url.includes('wp.com')) return url;
-  return 'https://wsrv.nl/?url=' + encodeURIComponent(url) + '&w=400&output=webp';
+  // URLs de Drive u otras fuentes propias — usar directo
+  if (url.includes('drive.google.com') || url.includes('googleusercontent')) return url;
+  // URLs de ASN/WordPress — pasar por proxy
+  if (url.includes('asncostarica.com') || url.includes('i0.wp.com')) {
+    // Limpiar parámetros de resize de WordPress antes de proxear
+    const clean = url.split('?')[0];
+    return 'https://images.weserv.nl/?url=' + encodeURIComponent(clean) + '&w=480&fit=contain&bg=f5f5f5&output=webp';
+  }
+  return url;
+}
+
+// Función de fallback: si el proxy falla, intenta la URL original
+function imgWithFallback(url, alt, cls='', extraStyle='') {
+  const proxied = proxyImg(url);
+  const original = url;
+  if (!url) return '<span class="fallback">💪</span>';
+  return `<img src="${proxied}" alt="${esc(alt)}" ${cls?'class="'+cls+'"':''} style="${extraStyle}" 
+    onerror="if(this.src!=='${original}'){this.src='${original}';}else{this.style.display='none';this.parentNode.querySelector&&this.parentNode.querySelector('.fallback')&&(this.parentNode.querySelector('.fallback').style.display='flex');}">`;
 }
 const WHATSAPP  = '50689222123';
 
@@ -944,7 +959,7 @@ function renderProductos() {
     const prStr= tp ? p.precio_promo.toLocaleString('es-CR',{maximumFractionDigits:0}) : '';
     const multi= p.imgs.length > 1;
     const slides = p.imgs.length
-      ? p.imgs.map(u=>`<div class="gallery-slide"><img src="${proxyImg(u)}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.style.display='none'"></div>`).join('')
+      ? p.imgs.map(u=>`<div class="gallery-slide"><span class="fallback" style="display:none">💪</span><img src="${proxyImg(u)}" alt="${esc(p.nombre)}" onerror="if(this.src.includes('weserv')){this.src=u;}else{this.style.display='none';}"></div>`).join('')
       : `<div class="gallery-slide"><span class="fallback">💪</span></div>`;
     const arrows = multi
       ? `<button class="gallery-arrow gallery-prev" onclick="event.stopPropagation();cardSlide(${fi},-1)">‹</button>
@@ -1036,12 +1051,13 @@ function renderProductPage(p) {
   // Gallery
   const thumbs = p.imgs.map((u,i)=>`
     <div class="pp-thumb ${i===0?'active':''}" id="thumb-${i}" onclick="ppSelectImg(${i},'${esc(u)}')">
-      <img src="${proxyImg(u)}" alt="${esc(p.nombre)}" loading="lazy">
+      <img src="${proxyImg(u)}" alt="${esc(p.nombre)}" onerror="this.src=u">
     </div>`).join('');
   // Store imgs globally for lightbox
   window._ppImgs = p.imgs.map(proxyImg);
+  window._ppImgsOrig = p.imgs.slice();
   const mainImg = p.imgs.length
-    ? `<img id="ppMainImg" src="${proxyImg(p.imgs[0])}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)">`
+    ? `<img id="ppMainImg" src="${proxyImg(p.imgs[0])}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)" onerror="if(!this.dataset.orig){this.dataset.orig=1;this.src=p.imgs[0];}">`
     : `<div class="fallback" style="font-size:80px;display:flex;align-items:center;justify-content:center;height:100%">💪</div>`;
 
   // Tags
@@ -1243,7 +1259,7 @@ function renderCarrito() {
     const key   = JSON.stringify(Object.keys(carrito).find(k=>carrito[k]===it));
     return `<div class="cart-item">
       <div class="ci-top">
-        ${thumb?`<img class="ci-img" src="${proxyImg(thumb)}" alt="${esc(it.nombre)}" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
+        ${thumb?`<img class="ci-img" src="${proxyImg(thumb)}" alt="${esc(it.nombre)}" onerror="if(!this.dataset.tried){this.dataset.tried=1;this.src=thumb;}else{this.style.display='none';}">`:`<div class="ci-img-fb">💪</div>`}
         <div class="ci-info">
           <div class="ci-name">${esc(it.nombre)}</div>
           <div class="ci-brand">${esc(it.marca)}${it.variante?` · <span style="color:var(--neon)">${esc(it.variante)}</span>`:''}</div>
