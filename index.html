@@ -107,10 +107,13 @@
     /* card-click-area deprecated — onclick en galería e info directamente */
 
     /* GALLERY */
-    .product-gallery{position:relative;width:100%;aspect-ratio:1;background:#f5f5f5;overflow:hidden;}
+    .product-gallery{position:relative;width:100%;aspect-ratio:1;background:#fff;overflow:hidden;}
+    .img-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg3);gap:6px;}
+    .img-placeholder span{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;padding:0 8px;}
+    .img-placeholder::before{content:'📦';font-size:36px;}
     .gallery-slides{display:flex;width:100%;height:100%;transition:transform .3s ease;}
     .gallery-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;flex-shrink:0;}
-    .gallery-slide img{width:100%;height:100%;object-fit:contain;background:#f5f5f5;padding:4px;}
+    .gallery-slide img{width:100%;height:100%;object-fit:contain;background:#fff;display:block;}
     .gallery-slide .fallback{font-size:52px;}
     .gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:5;transition:background .15s;opacity:0;}
     .product-card:hover .gallery-arrow{opacity:1;}
@@ -590,27 +593,16 @@
 // ═══════════════════════════════════════
 const SHEET_URL = 'https://opensheet.elk.sh/1fSSQCTbL-acUIVYKLPNDgqi4ktAA3FMtgHXIKvVeC0w/1';
 
-// Proxy para imágenes — maneja hotlink protection
+// Procesar URLs de imágenes
 function proxyImg(url) {
   if (!url) return '';
-  // URLs de Drive u otras fuentes propias — usar directo
-  if (url.includes('drive.google.com') || url.includes('googleusercontent')) return url;
-  // URLs de ASN/WordPress — pasar por proxy
-  if (url.includes('asncostarica.com') || url.includes('i0.wp.com')) {
-    // Limpiar parámetros de resize de WordPress antes de proxear
-    const clean = url.split('?')[0];
-    return 'https://images.weserv.nl/?url=' + encodeURIComponent(clean) + '&w=480&fit=contain&bg=f5f5f5&output=webp';
-  }
+  // Google Drive: convertir link de compartir a thumbnail directo
+  const driveFile = url.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if (driveFile) return 'https://drive.google.com/thumbnail?id=' + driveFile[1] + '&sz=w480';
+  const driveOpen = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+  if (driveOpen) return 'https://drive.google.com/thumbnail?id=' + driveOpen[1] + '&sz=w480';
+  // Cualquier otra URL (WordPress, CDN, etc.) — usar directo sin modificar
   return url;
-}
-
-// Función de fallback: si el proxy falla, intenta la URL original
-function imgWithFallback(url, alt, cls='', extraStyle='') {
-  const proxied = proxyImg(url);
-  const original = url;
-  if (!url) return '<span class="fallback">💪</span>';
-  return `<img src="${proxied}" alt="${esc(alt)}" ${cls?'class="'+cls+'"':''} style="${extraStyle}" 
-    onerror="if(this.src!=='${original}'){this.src='${original}';}else{this.style.display='none';this.parentNode.querySelector&&this.parentNode.querySelector('.fallback')&&(this.parentNode.querySelector('.fallback').style.display='flex');}">`;
 }
 const WHATSAPP  = '50689222123';
 
@@ -959,7 +951,7 @@ function renderProductos() {
     const prStr= tp ? p.precio_promo.toLocaleString('es-CR',{maximumFractionDigits:0}) : '';
     const multi= p.imgs.length > 1;
     const slides = p.imgs.length
-      ? p.imgs.map(u=>`<div class="gallery-slide"><span class="fallback" style="display:none">💪</span><img src="${proxyImg(u)}" alt="${esc(p.nombre)}" onerror="if(this.src.includes('weserv')){this.src=u;}else{this.style.display='none';}"></div>`).join('')
+      ? p.imgs.map(u=>`<div class="gallery-slide"><div class="img-placeholder"><span>${esc(p.marca.split(" ")[0])}</span></div><img src="${u}" alt="${esc(p.nombre)}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'"></div>`).join('')
       : `<div class="gallery-slide"><span class="fallback">💪</span></div>`;
     const arrows = multi
       ? `<button class="gallery-arrow gallery-prev" onclick="event.stopPropagation();cardSlide(${fi},-1)">‹</button>
@@ -1051,13 +1043,12 @@ function renderProductPage(p) {
   // Gallery
   const thumbs = p.imgs.map((u,i)=>`
     <div class="pp-thumb ${i===0?'active':''}" id="thumb-${i}" onclick="ppSelectImg(${i},'${esc(u)}')">
-      <img src="${proxyImg(u)}" alt="${esc(p.nombre)}" onerror="this.src=u">
+      <img src="${u}" alt="${esc(p.nombre)}" onerror="this.style.display='none'">
     </div>`).join('');
   // Store imgs globally for lightbox
-  window._ppImgs = p.imgs.map(proxyImg);
-  window._ppImgsOrig = p.imgs.slice();
+  window._ppImgs = p.imgs.slice();
   const mainImg = p.imgs.length
-    ? `<img id="ppMainImg" src="${proxyImg(p.imgs[0])}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)" onerror="if(!this.dataset.orig){this.dataset.orig=1;this.src=p.imgs[0];}">`
+    ? `<img id="ppMainImg" src="${p.imgs[0]}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)" onerror="this.style.display='none'">`
     : `<div class="fallback" style="font-size:80px;display:flex;align-items:center;justify-content:center;height:100%">💪</div>`;
 
   // Tags
@@ -1259,7 +1250,7 @@ function renderCarrito() {
     const key   = JSON.stringify(Object.keys(carrito).find(k=>carrito[k]===it));
     return `<div class="cart-item">
       <div class="ci-top">
-        ${thumb?`<img class="ci-img" src="${proxyImg(thumb)}" alt="${esc(it.nombre)}" onerror="if(!this.dataset.tried){this.dataset.tried=1;this.src=thumb;}else{this.style.display='none';}">`:`<div class="ci-img-fb">💪</div>`}
+        ${thumb?`<img class="ci-img" src="${thumb}" alt="${esc(it.nombre)}" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
         <div class="ci-info">
           <div class="ci-name">${esc(it.nombre)}</div>
           <div class="ci-brand">${esc(it.marca)}${it.variante?` · <span style="color:var(--neon)">${esc(it.variante)}</span>`:''}</div>
