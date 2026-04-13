@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer">
   <title>GetFit Supplements</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -951,7 +952,7 @@ function renderProductos() {
     const prStr= tp ? p.precio_promo.toLocaleString('es-CR',{maximumFractionDigits:0}) : '';
     const multi= p.imgs.length > 1;
     const slides = p.imgs.length
-      ? p.imgs.map(u=>`<div class="gallery-slide"><div class="img-placeholder"><span>${esc(p.marca.split(" ")[0])}</span></div><img src="${u}" alt="${esc(p.nombre)}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'"></div>`).join('')
+      ? p.imgs.map(u=>`<div class="gallery-slide"><div class="img-placeholder"><span>${esc(p.marca.split(" ")[0])}</span></div><img src="${u}" alt="${esc(p.nombre)}" referrerpolicy="no-referrer" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'"></div>`).join('')
       : `<div class="gallery-slide"><span class="fallback">💪</span></div>`;
     const arrows = multi
       ? `<button class="gallery-arrow gallery-prev" onclick="event.stopPropagation();cardSlide(${fi},-1)">‹</button>
@@ -1043,12 +1044,12 @@ function renderProductPage(p) {
   // Gallery
   const thumbs = p.imgs.map((u,i)=>`
     <div class="pp-thumb ${i===0?'active':''}" id="thumb-${i}" onclick="ppSelectImg(${i},'${esc(u)}')">
-      <img src="${u}" alt="${esc(p.nombre)}" onerror="this.style.display='none'">
+      <img src="${u}" alt="${esc(p.nombre)}" referrerpolicy="no-referrer" onerror="this.style.display='none'">
     </div>`).join('');
   // Store imgs globally for lightbox
   window._ppImgs = p.imgs.slice();
   const mainImg = p.imgs.length
-    ? `<img id="ppMainImg" src="${p.imgs[0]}" alt="${esc(p.nombre)}" style="cursor:zoom-in" onclick="openLightbox(window._ppImgs,0)" onerror="this.style.display='none'">`
+    ? `<img id="ppMainImg" src="${p.imgs[0]}" alt="${esc(p.nombre)}" style="cursor:zoom-in" referrerpolicy="no-referrer" onclick="openLightbox(window._ppImgs,0)" onerror="this.style.display='none'">`
     : `<div class="fallback" style="font-size:80px;display:flex;align-items:center;justify-content:center;height:100%">💪</div>`;
 
   // Tags
@@ -1250,7 +1251,7 @@ function renderCarrito() {
     const key   = JSON.stringify(Object.keys(carrito).find(k=>carrito[k]===it));
     return `<div class="cart-item">
       <div class="ci-top">
-        ${thumb?`<img class="ci-img" src="${thumb}" alt="${esc(it.nombre)}" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
+        ${thumb?`<img class="ci-img" src="${thumb}" alt="${esc(it.nombre)}" referrerpolicy="no-referrer" onerror="this.style.display='none'">`:`<div class="ci-img-fb">💪</div>`}
         <div class="ci-info">
           <div class="ci-name">${esc(it.nombre)}</div>
           <div class="ci-brand">${esc(it.marca)}${it.variante?` · <span style="color:var(--neon)">${esc(it.variante)}</span>`:''}</div>
