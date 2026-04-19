@@ -112,7 +112,7 @@
     .img-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg3);gap:6px;}
     .img-placeholder span{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;padding:0 8px;}
     .img-placeholder::before{content:'📦';font-size:36px;}
-    .gallery-slides{display:flex;width:100%;height:100%;transition:transform .3s ease;}
+    .gallery-slides{display:flex;width:100%;height:100%;transition:transform .3s ease;overflow:hidden;}
     .gallery-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;flex-shrink:0;}
     .gallery-slide img{width:100%;height:100%;object-fit:contain;background:#fff;display:block;}
     .gallery-slide .fallback{font-size:52px;}
@@ -334,6 +334,10 @@
       .content-title{font-size:18px;}
       .content-count{font-size:12px;margin-top:0;}
       .sort-select{font-size:12px;padding:6px 10px;width:100%;}
+
+      /* ── GALLERY ARROWS VISIBLE EN TOUCH ── */
+      .gallery-arrow{opacity:0.75;}
+      .gallery-arrow:active{background:rgba(57,255,20,.85);color:#000;}
 
       /* ── GRID 2 COLUMNAS ── */
       .product-grid{grid-template-columns:1fr 1fr;gap:8px;}
@@ -995,9 +999,21 @@ function renderProductos() {
       </div>
     </div>`;
   }).join('');
+  filtrados.forEach((p, fi) => { if (p.imgs.length > 1) initTouchSlide(fi); });
 }
 
 // ── CARD GALLERY ─────────────────────────
+function initTouchSlide(fi) {
+  const el = document.getElementById('gslides-' + fi);
+  if (!el) return;
+  let startX = 0;
+  el.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  el.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40) cardSlide(fi, dx < 0 ? 1 : -1);
+  }, { passive: true });
+}
+
 function cardSlide(fi, dir) {
   const p = filtrados[fi]; if(!p||p.imgs.length<=1) return;
   gPos[fi] = (((gPos[fi]||0)+dir)+p.imgs.length)%p.imgs.length;
