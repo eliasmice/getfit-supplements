@@ -642,16 +642,12 @@ async function cargarProductos() {
       categoria:    (row.categoria    ||'Suplementos').trim(),
       subcategoria: (row.subcategoria ||'').trim(),
       info:         (row.info         ||'').trim(),
-      imagen1:      (row.imagen1      ||'').trim(),
-      imagen2:      (row.imagen2      ||'').trim(),
-      imagen3:      (row.imagen3      ||'').trim(),
-      imagen4:      (row.imagen4      ||'').trim(),
       sabores:      (row.sabores      ||'').trim(),
       tamanios:     (row.tamanios     ||'').trim(),
       disponible:   (row.disponible   ||'si').toLowerCase() !== 'no',
       nuevo:        (row.nuevo        ||'no').toLowerCase() === 'si',
-    })).filter(p => p.nombre)
-      .map(p => ({...p, imgs:[p.imagen1,p.imagen2,p.imagen3,p.imagen4].filter(Boolean)}));
+      imgs:         (row.imagenes     ||'').split('|').map(u=>proxyImg(u.trim())).filter(Boolean),
+    })).filter(p => p.nombre);
     construirSidebar();
     aplicarFiltros();
     // check URL for product
