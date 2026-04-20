@@ -112,7 +112,8 @@
     .img-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg3);gap:6px;}
     .img-placeholder span{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;padding:0 8px;}
     .img-placeholder::before{content:'📦';font-size:36px;}
-    .gallery-slides{position:absolute;inset:0;display:flex;width:100%;transition:transform .3s ease;overflow:hidden;}
+    .gallery-viewport{position:absolute;inset:0;overflow:hidden;}
+    .gallery-slides{display:flex;width:100%;height:100%;transition:transform .3s ease;}
     .gallery-slide{min-width:100%;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f0f0f0;flex-shrink:0;}
     .gallery-slide img{width:100%;height:100%;object-fit:contain;background:#fff;display:block;}
     .gallery-slide .fallback{font-size:52px;}
@@ -978,7 +979,7 @@ function renderProductos() {
     return `
     <div class="product-card" id="card-${p.id}">
       <div class="product-gallery" onclick="showProductPage(todos.find(x=>x.id===${p.id}))" style="cursor:pointer">
-        <div class="gallery-slides" id="gslides-${fi}">${slides}</div>
+        <div class="gallery-viewport"><div class="gallery-slides" id="gslides-${fi}">${slides}</div></div>
         ${arrows}${dots}
         <div class="brand-tag">${esc(p.marca)}</div>
         ${ctag}
